@@ -14,11 +14,19 @@
 </head>
 <body>
 
+<!-- ── Study app-bar ──────────────────────────────────────────────────────── -->
+<div class="study-appbar">
+  <div class="study-appbar__inner">
+    <a href="deck.html" class="study-appbar__back" aria-label="Back to deck">
+      <i class="bi bi-chevron-left" style="font-size:1.1rem;"></i>
+    </a>
+    <span class="study-appbar__title" id="studyAppbarTitle"></span>
+    <span></span>
+  </div>
+</div>
+
 <!-- ── Study tab bar ─────────────────────────────────────────────────────── -->
 <div class="study-tabs" id="studyTabs">
-  <a href="deck.html" class="study-tab" style="color:var(--sl-muted);">
-    <i class="bi bi-arrow-left"></i> Deck
-  </a>
   <a href="words.html"      class="study-tab active"><i class="bi bi-list-ul"></i> Words</a>
   <a href="flashcards.html" class="study-tab"><i class="bi bi-card-text"></i> Flashcards</a>
   <a href="test.html"       class="study-tab"><i class="bi bi-patch-question"></i> Test</a>
@@ -129,6 +137,7 @@
       setTimeout(() => window.location.replace('library.html'), 800);
       return;
     }
+    document.getElementById('studyAppbarTitle').textContent = deck.name;
     document.getElementById('deckNameHeading').value = deck.name;
     updateDeckMeta();
     renderWords();

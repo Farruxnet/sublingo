@@ -72,7 +72,7 @@ function renderQuestion() {
   document.getElementById('progressBar').style.width    = pct + '%';
   document.getElementById('qCounter').textContent       = `${currentQ + 1} / ${questions.length}`;
   document.getElementById('scoreDisplay').textContent   = `Score: ${score}`;
-  document.getElementById('deckLabel').textContent      = deck.name;
+  document.getElementById('studyAppbarTitle').textContent = deck.name;
   document.getElementById('questionWord').textContent   = word.word;
   document.getElementById('questionIpa').textContent    = word.ipa;
 
