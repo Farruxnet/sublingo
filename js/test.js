@@ -55,10 +55,8 @@ function initTest() {
 }
 
 function showNoDeck(msg) {
-  document.getElementById('questionScreen').classList.add('d-none');
-  document.getElementById('resultsScreen').classList.add('d-none');
-  document.getElementById('noDeckScreen').classList.remove('d-none');
-  if (msg) document.getElementById('noDeckMsg').textContent = msg;
+  showToast(msg || 'No deck selected — pick one from your library', 'info');
+  setTimeout(() => window.location.replace('library.html'), 800);
 }
 
 function renderQuestion() {

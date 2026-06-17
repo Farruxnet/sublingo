@@ -19,9 +19,8 @@ function initDeck() {
 }
 
 function showNoDeck() {
-  document.getElementById('studyScreen').classList.add('d-none');
-  document.getElementById('completionScreen').classList.add('d-none');
-  document.getElementById('noDeckScreen').classList.remove('d-none');
+  showToast('No deck selected — pick one from your library', 'info');
+  setTimeout(() => window.location.replace('library.html'), 800);
 }
 
 function renderCard() {

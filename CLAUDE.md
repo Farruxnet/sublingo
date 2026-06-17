@@ -18,9 +18,10 @@ Language pair: **English → Uzbek**. The UI language is English. All user-facin
 
 ```
 sublingo/
-├── index.html          Landing page (logged-out): hero + value loop + login/guest form
+├── index.html          Landing page (logged-out): hero + value loop + provider login
 ├── library.html        My Library (logged-in): deck grid + new-deck modal
-├── words.html          Deck detail: word list + filters + inline rename
+├── deck.html           Deck hub: icon tiles → Words / Flashcards / Test (entry point after openDeck())
+├── words.html          Word list + filters + inline rename
 ├── flashcards.html     Flip-card study screen (deck-scoped)
 ├── test.html           Multiple-choice quiz screen (deck-scoped)
 ├── css/
@@ -32,6 +33,9 @@ sublingo/
     ├── flashcards.js   Deck-scoped flashcard logic
     └── test.js         Deck-scoped quiz logic
 ```
+
+Navigation flow: `index.html` → (login) → `library.html` → (openDeck) → `deck.html` → Words / Flashcards / Test.
+The `.study-tabs` bar inside study pages has a "← Deck" link back to `deck.html`.
 
 Every HTML page loads scripts in this exact order: `mockData.js` → `main.js` → page-specific JS. Do not reorder; `mockData.js` must run first because all other scripts depend on `DECKS`, auth helpers, and other globals it defines.
 
@@ -169,8 +173,11 @@ fetch('/api/test/answer', {
 });
 ```
 
-### `index.html` — login form `submit` handler
-Replace `loginUser(email)` mock with a real auth call (Supabase, Firebase, custom JWT). On success, store the JWT/session token and set `sublingo_loggedIn`. `requireAuth()` will need to validate the token rather than just checking a boolean.
+### `index.html` — `loginWithProvider(provider)`
+Replace mock body with real OAuth:
+- Google: `google.accounts.id.initialize()` → exchange `id_token` at `POST /api/auth/google`
+- Telegram: inject Telegram Login Widget, handle callback at `POST /api/auth/telegram`
+Both return `{ email, token }`; store token, call `loginUser(email)`. `requireAuth()` will later validate the token server-side instead of checking a localStorage bool.
 
 ---
 

@@ -1202,3 +1202,83 @@ footer {
 
 /* toast warning colour */
 .toast-icon[data-type="warning"] { color: #92400e; }
+
+/* ─── Provider login buttons ─────────────────────────────────────────────────*/
+.btn-provider {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  width: 100%;
+  min-height: 48px;
+  padding: .625rem 1.25rem;
+  background: var(--sl-surface);
+  border: 1.5px solid var(--sl-line);
+  border-radius: var(--sl-radius-sm);
+  font-size: var(--sl-text-sm);
+  font-weight: 600;
+  color: var(--sl-ink);
+  cursor: pointer;
+  transition: background .12s, border-color .12s, box-shadow .12s;
+  text-align: left;
+}
+.btn-provider:hover  { background: var(--sl-soft); border-color: var(--sl-muted); }
+.btn-provider:focus-visible {
+  outline: 2px solid var(--sl-primary);
+  outline-offset: 2px;
+}
+.btn-provider svg { flex-shrink: 0; }
+
+/* ─── Deck hub tiles ─────────────────────────────────────────────────────────*/
+.hub-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: .5rem;
+  padding: 1.625rem 1.5rem;
+  background: var(--sl-surface);
+  border: 1.5px solid var(--sl-line);
+  border-radius: var(--sl-radius);
+  box-shadow: var(--sl-shadow);
+  text-decoration: none;
+  color: var(--sl-ink);
+  min-height: 148px;
+  cursor: pointer;
+  transition: box-shadow .14s, border-color .14s, transform .12s;
+}
+.hub-tile:hover {
+  box-shadow: var(--sl-shadow-md);
+  border-color: var(--sl-primary);
+  transform: translateY(-2px);
+  color: var(--sl-ink);
+}
+.hub-tile:focus-visible {
+  outline: 2px solid var(--sl-primary);
+  outline-offset: 2px;
+}
+.hub-tile.hub-tile--accent {
+  background: var(--sl-accent);
+  border-color: var(--sl-accent);
+  color: #fff;
+}
+.hub-tile.hub-tile--accent:hover { border-color: #c95f2c; }
+.hub-tile.hub-tile--disabled {
+  opacity: .5;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+.hub-tile__icon {
+  font-size: 1.75rem;
+  line-height: 1;
+}
+.hub-tile__title {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: var(--sl-text-lg);
+  font-weight: 700;
+  line-height: 1.15;
+  margin: 0;
+}
+.hub-tile__desc {
+  font-size: var(--sl-text-xs);
+  opacity: .75;
+  margin: 0;
+}

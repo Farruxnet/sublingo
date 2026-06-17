@@ -67,7 +67,7 @@ function renderLibrary() {
 // ─── Open deck ────────────────────────────────────────────────────────────────
 function openDeck(id) {
   setActiveDeck(id);
-  navigateTo('words.html');
+  navigateTo('deck.html');
 }
 
 function studyDeck(id) {

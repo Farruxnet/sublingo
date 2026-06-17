@@ -37,11 +37,10 @@
 
 <!-- ── Study tab bar ─────────────────────────────────────────────────────── -->
 <div class="study-tabs">
+  <a href="deck.html" class="study-tab" style="color:var(--sl-muted);"><i class="bi bi-arrow-left"></i> Deck</a>
   <a href="words.html"      class="study-tab"><i class="bi bi-list-ul"></i> Words</a>
   <a href="flashcards.html" class="study-tab active"><i class="bi bi-card-text"></i> Flashcards</a>
   <a href="test.html"       class="study-tab"><i class="bi bi-patch-question"></i> Test</a>
-  <span class="study-tab ms-auto" id="activeDeckTab"
-        style="color:var(--sl-muted);cursor:default;font-weight:400;font-style:italic;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
 </div>
 
 <main class="container py-4" style="max-width:640px;">
@@ -53,11 +52,12 @@
     <p class="sl-empty__body">Go to your library, open a deck, then come back to study.</p>
     <a href="library.html" class="btn-primary-sl">Back to Library</a>
   </div>
+  <!-- ponytail: no-deck case auto-redirects in initDeck(), this screen is a fallback only -->
 
   <!-- ── Study screen ──────────────────────────────────────────────────────── -->
   <div id="studyScreen">
     <div class="d-flex align-items-center justify-content-between mb-2">
-      <a href="words.html"
+      <a href="deck.html"
          style="font-size:var(--sl-text-xs);color:var(--sl-muted);text-decoration:none;display:inline-flex;align-items:center;gap:.3rem;">
         <i class="bi bi-arrow-left"></i>
         <span id="deckLabel" style="font-weight:500;color:var(--sl-ink);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>

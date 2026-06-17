@@ -37,17 +37,12 @@
 
 <!-- ── Study tab bar ─────────────────────────────────────────────────────── -->
 <div class="study-tabs" id="studyTabs">
-  <a href="words.html"      class="study-tab active" data-page="words.html">
-    <i class="bi bi-list-ul"></i> Words
+  <a href="deck.html" class="study-tab" style="color:var(--sl-muted);">
+    <i class="bi bi-arrow-left"></i> Deck
   </a>
-  <a href="flashcards.html" class="study-tab" data-page="flashcards.html">
-    <i class="bi bi-card-text"></i> Flashcards
-  </a>
-  <a href="test.html"       class="study-tab" data-page="test.html">
-    <i class="bi bi-patch-question"></i> Test
-  </a>
-  <span class="study-tab ms-auto" id="activeDeckTab"
-        style="color:var(--sl-muted);cursor:default;font-weight:400;font-style:italic;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+  <a href="words.html"      class="study-tab active"><i class="bi bi-list-ul"></i> Words</a>
+  <a href="flashcards.html" class="study-tab"><i class="bi bi-card-text"></i> Flashcards</a>
+  <a href="test.html"       class="study-tab"><i class="bi bi-patch-question"></i> Test</a>
 </div>
 
 <main style="max-width:1100px;margin:0 auto;padding:0 1.25rem 5rem;">
@@ -56,9 +51,9 @@
   <div class="deck-header mt-4" id="deckHeader">
     <div class="d-flex align-items-start justify-content-between gap-3 flex-wrap">
       <div style="flex:1;min-width:0;">
-        <a href="library.html"
+        <a href="deck.html"
            style="font-size:var(--sl-text-xs);color:var(--sl-muted);text-decoration:none;display:inline-flex;align-items:center;gap:.3rem;margin-bottom:.5rem;">
-          <i class="bi bi-arrow-left"></i> Library
+          <i class="bi bi-arrow-left"></i> Back to deck
         </a>
         <input class="deck-header__name" id="deckNameHeading" type="text" maxlength="60"
                aria-label="Deck name (click to rename)"
@@ -165,10 +160,8 @@
 
   function init() {
     if (!deck) {
-      document.getElementById('noDeckState').classList.remove('d-none');
-      document.getElementById('filterBar').classList.add('d-none');
-      document.getElementById('studyBar').classList.add('d-none');
-      document.getElementById('deckHeader').classList.add('d-none');
+      showToast('No deck selected — pick one from your library', 'info');
+      setTimeout(() => window.location.replace('library.html'), 800);
       return;
     }
     const tabLabel = document.getElementById('activeDeckTab');
