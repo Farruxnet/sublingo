@@ -1,7 +1,7 @@
 # SubLingo — Agent Integration Guide & Technical Specification
 
-> **Current version:** v0.2 — Decks system + design elevation
-> Last updated to match: `CLAUDE.md` v0.2, commit `d8d862d`
+> **Current version:** v0.5 — Dark mode, slim navbar, dead-code cleanup
+> Last updated to match: `CLAUDE.md` v0.5, commit `18ad816`
 
 This document describes the planned AI-agent architecture for SubLingo and specifies every interface an agent must implement or consume. It is written for engineers building the backend and for AI coding agents implementing those features.
 
@@ -367,7 +367,7 @@ fetch('/api/test/answer', {
 
 ## Session & user identity
 
-No authentication in MVP. `getAnonymousId()` in `main.js` generates and persists a UUID in `localStorage` key `sublingo_uid`. It is already implemented and called by both `flashcards.js` and `test.js`.
+No authentication in MVP. `getAnonymousId()` in `mockData.js` generates and persists a UUID in `localStorage` key `sublingo_uid`. It is already implemented and called by both `flashcards.js` and `test.js`.
 
 When real auth is added, replace `getAnonymousId()` calls with a JWT claim — no other changes needed at the call sites.
 

@@ -8,7 +8,7 @@ This file is the authoritative guide for any AI agent (Claude or otherwise) work
 
 SubLingo is a static, front-end-only web app that helps Uzbek-speaking users learn English vocabulary from video subtitles. Users create named **decks** from subtitle files; each deck is a self-contained study group. They study decks via flip-card review and multiple-choice tests.
 
-Current state: **MVP v0.3 UI shell** — all data is mocked, there is no real backend, and every real integration point is marked with a `// TODO:` comment. Auth is also mocked (localStorage flag).
+Current state: **MVP v0.5 UI shell** — all data is mocked, there is no real backend, and every real integration point is marked with a `// TODO:` comment. Auth is also mocked (localStorage flag). Dark mode, slim navbar, and dead-code cleanup were applied in v0.5.
 
 Language pair: **English → Uzbek**. The UI language is English. All user-facing strings are written inline — they should eventually be extracted into a single `i18n.js` localization object.
 
