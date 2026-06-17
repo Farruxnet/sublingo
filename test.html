@@ -14,21 +14,6 @@
 </head>
 <body>
 
-<!-- ── Navbar ────────────────────────────────────────────────────────────── -->
-<nav class="sl-navbar sticky-top">
-  <div class="container d-flex align-items-center justify-content-between" style="max-width:1100px;">
-    <a class="sl-brand" href="library.html">
-      <span class="sl-brand-mark"><i class="bi bi-translate"></i></span>
-      SubLingo
-    </a>
-    <div class="d-flex align-items-center gap-2">
-      <button class="btn-theme" id="themeToggle" aria-label="Switch theme"><i class="bi bi-moon"></i></button>
-      <span class="nav-user-chip"><i class="bi bi-person-circle"></i><span id="navUserChip">…</span></span>
-      <button class="nav-logout-btn" id="logoutBtn" aria-label="Log out" title="Log out"><i class="bi bi-box-arrow-right"></i></button>
-    </div>
-  </div>
-</nav>
-
 <!-- ── Study tab bar ─────────────────────────────────────────────────────── -->
 <div class="study-tabs">
   <a href="deck.html" class="study-tab" style="color:var(--sl-muted);"><i class="bi bi-arrow-left"></i> Deck</a>
@@ -124,7 +109,6 @@
   if (!requireAuth()) { /* stops here */ }
 
   document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('logoutBtn').addEventListener('click', () => { logoutUser(); window.location.replace('index.html'); });
     initTest();
 
     document.getElementById('audioBtn').addEventListener('click', () => {

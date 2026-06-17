@@ -14,21 +14,6 @@
 </head>
 <body>
 
-<!-- ── Navbar ────────────────────────────────────────────────────────────── -->
-<nav class="sl-navbar sticky-top">
-  <div class="container d-flex align-items-center justify-content-between" style="max-width:1100px;">
-    <a class="sl-brand" href="library.html">
-      <span class="sl-brand-mark"><i class="bi bi-translate"></i></span>
-      SubLingo
-    </a>
-    <div class="d-flex align-items-center gap-2">
-      <button class="btn-theme" id="themeToggle" aria-label="Switch theme"><i class="bi bi-moon"></i></button>
-      <span class="nav-user-chip"><i class="bi bi-person-circle"></i><span id="navUserChip">…</span></span>
-      <button class="nav-logout-btn" id="logoutBtn" aria-label="Log out" title="Log out"><i class="bi bi-box-arrow-right"></i></button>
-    </div>
-  </div>
-</nav>
-
 <!-- ── Study tab bar ─────────────────────────────────────────────────────── -->
 <div class="study-tabs" id="studyTabs">
   <a href="deck.html" class="study-tab" style="color:var(--sl-muted);">
@@ -45,10 +30,6 @@
   <div class="deck-header mt-4" id="deckHeader">
     <div class="d-flex align-items-start justify-content-between gap-3 flex-wrap">
       <div style="flex:1;min-width:0;">
-        <a href="deck.html"
-           style="font-size:var(--sl-text-xs);color:var(--sl-muted);text-decoration:none;display:inline-flex;align-items:center;gap:.3rem;margin-bottom:.5rem;">
-          <i class="bi bi-arrow-left"></i> Back to deck
-        </a>
         <input class="deck-header__name" id="deckNameHeading" type="text" maxlength="60"
                aria-label="Deck name (click to rename)"
                onblur="saveDeckName()"
@@ -139,8 +120,6 @@
 <script src="js/main.js"></script>
 <script>
   if (!requireAuth()) { /* stops here */ }
-
-  document.getElementById('logoutBtn').addEventListener('click', () => { logoutUser(); window.location.replace('index.html'); });
 
   const deck = getActiveDeck();
 

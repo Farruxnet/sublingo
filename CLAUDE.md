@@ -43,6 +43,8 @@ The `.study-tabs` bar inside study pages has a "← Deck" link back to `deck.htm
 
 **v0.7 changes:** Navbar hamburger toggler and `.navbar-collapse` block removed from all five logged-in pages (`library.html`, `deck.html`, `words.html`, `flashcards.html`, `test.html`). The global navbar now contains only brand/logo (`href="library.html"` on all logged-in pages), theme toggle (`.btn-theme`), user chip (`.nav-user-chip`), and logout button (`.nav-logout-btn`) — all always-visible inline, no collapse. The "My Library" nav link that lived inside the collapse is gone; back-navigation on study pages is handled entirely by `.study-tabs` and the breadcrumb links already present on each page.
 
+**v0.8 changes:** Global navbar (`.sl-navbar`) removed entirely from the three study pages (`words.html`, `flashcards.html`, `test.html`). These pages are deck-scoped and reached only via `deck.html`; they do not need top-level navigation. Back navigation on all three is the `.study-tabs` bar: the first tab is `← Deck` linking to `deck.html`. The duplicate "← Back to deck" inline link that appeared inside `.deck-header` on `words.html` was also removed (one back path only). Stale `logoutBtn` event listeners removed from all three pages' inline scripts. `index.html`, `library.html`, and `deck.html` are unchanged — they retain the full navbar with brand → `library.html`, theme toggle, user chip, and logout.
+
 Every HTML page loads scripts in this exact order: `telegram-web-app.js` (CDN) → `mockData.js` → `main.js` → page-specific JS. Telegram script must precede mockData so `window.Telegram` is defined when `initTelegram()` runs. Do not reorder the rest; `mockData.js` must load before `main.js` and page JS.
 
 ---
