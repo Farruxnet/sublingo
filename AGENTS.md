@@ -1,7 +1,7 @@
 # SubLingo — Agent Integration Guide & Technical Specification
 
-> **Current version:** v0.5 — Dark mode, slim navbar, dead-code cleanup
-> Last updated to match: `CLAUDE.md` v0.5, commit `18ad816`
+> **Current version:** v0.6 — QA pass, Telegram Mini App, mobile polish
+> Last updated to match: `CLAUDE.md` v0.6, commit `fad5f18`
 
 This document describes the planned AI-agent architecture for SubLingo and specifies every interface an agent must implement or consume. It is written for engineers building the backend and for AI coding agents implementing those features.
 

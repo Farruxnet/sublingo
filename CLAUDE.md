@@ -8,7 +8,7 @@ This file is the authoritative guide for any AI agent (Claude or otherwise) work
 
 SubLingo is a static, front-end-only web app that helps Uzbek-speaking users learn English vocabulary from video subtitles. Users create named **decks** from subtitle files; each deck is a self-contained study group. They study decks via flip-card review and multiple-choice tests.
 
-Current state: **MVP v0.5 UI shell** — all data is mocked, there is no real backend, and every real integration point is marked with a `// TODO:` comment. Auth is also mocked (localStorage flag). Dark mode, slim navbar, and dead-code cleanup were applied in v0.5.
+Current state: **MVP v0.6 UI shell** — all data is mocked, there is no real backend, and every real integration point is marked with a `// TODO:` comment. Auth is also mocked (localStorage flag). v0.6 adds Telegram Mini App support, crash-fix QA pass, dark-mode icon toggle, learned-word toggle on the word list, and mobile polish.
 
 Language pair: **English → Uzbek**. The UI language is English. All user-facing strings are written inline — they should eventually be extracted into a single `i18n.js` localization object.
 
@@ -39,7 +39,9 @@ The `.study-tabs` bar inside study pages has a "← Deck" link back to `deck.htm
 
 **Removed in v0.5 cleanup:** `.sl-hero*`, `.sl-word-chips`, `.sl-chip`, `.underline-accent`, `.sl-section-label` CSS rules (no HTML referenced them). Inline `<style>` block from `test.html` (moved `.feedback-correct/.feedback-wrong` to `style.css`). Per-deck nav links (Words/Flashcards/Test) removed from the global navbar — those live in `.study-tabs` and `deck.html` hub tiles only.
 
-Every HTML page loads scripts in this exact order: `mockData.js` → `main.js` → page-specific JS. Do not reorder; `mockData.js` must run first because all other scripts depend on `DECKS`, auth helpers, and other globals it defines.
+**v0.6 changes:** Telegram Mini App script in every page `<head>`; `initTelegram()` IIFE in `main.js`; crash-fixed `#noDeckScreen` null refs in `flashcards.js` and `test.js`; `requireAuth()` moved before `library.js` loads; sun/moon SVG swap on theme toggle (`_updateThemeIcon()`); learned-word toggle button added to every word card in `words.html` (`toggleLearned()`); Bootstrap navbar collapse fixed (removed conflicting `d-md-flex`); "Library" → "My Library" across all logged-in pages; safe-area insets on `<body>` for Telegram/iOS; mobile tap-target enlargements.
+
+Every HTML page loads scripts in this exact order: `telegram-web-app.js` (CDN) → `mockData.js` → `main.js` → page-specific JS. Telegram script must precede mockData so `window.Telegram` is defined when `initTelegram()` runs. Do not reorder the rest; `mockData.js` must load before `main.js` and page JS.
 
 ---
 
@@ -179,7 +181,8 @@ fetch('/api/test/answer', {
 ### `index.html` — `loginWithProvider(provider)`
 Replace mock body with real OAuth:
 - Google: `google.accounts.id.initialize()` → exchange `id_token` at `POST /api/auth/google`
-- Telegram: inject Telegram Login Widget, handle callback at `POST /api/auth/telegram`
+- Telegram (Mini App): read `Telegram.WebApp.initDataUnsafe.user`, skip the button UI, POST `{ initData: Telegram.WebApp.initData }` → `POST /api/auth/telegram`
+- Telegram (widget): inject Telegram Login Widget, handle callback at `POST /api/auth/telegram`
 Both return `{ email, token }`; store token, call `loginUser(email)`. `requireAuth()` will later validate the token server-side instead of checking a localStorage bool.
 
 ---
@@ -209,11 +212,13 @@ Accent (`--sl-accent`: terracotta `#E2703A`) is used sparingly — one key call-
 |---|---|
 | `.landing-hero` | `index.html` hero section (logged-out) |
 | `.login-card` | Login/email form card on `index.html` |
-| `.study-tabs` | Tab bar (Words / Flashcards / Test) on study pages |
+| `.study-tabs` | Tab bar (Words / Flashcards / Test) on study pages; scrolls horizontally on mobile |
 | `.skeleton-card` + `.skel` | Loading placeholders (shimmer animation) |
 | `.nav-user-chip` | Logged-in navbar: shows email prefix |
 | `.nav-logout-btn` | Logout icon button in navbar |
+| `.btn-theme` | Sun/moon theme toggle; icon swapped by `_updateThemeIcon()` on every toggle |
 | `.modal-loading-overlay` | Spinner overlay inside new-deck modal during parse/extract |
+| `.result-circle--good/ok/bad` | Score circle color variants in test results (all CSS-var, no hardcoded hex) |
 
 ---
 
@@ -227,7 +232,8 @@ Accent (`--sl-accent`: terracotta `#E2703A`) is used sparingly — one key call-
 - **No Uzbek text in `onclick` attributes.** Always use `addEventListener` + index/id references.
 - **Script load order:** `mockData.js` → `main.js` → page-specific JS. Enforced in every HTML file.
 - **`recomputeStats(deck)` + `saveDecksToStorage()` after any mutation** that changes a word's `learned` flag.
-- **`requireAuth()` on all pages except `index.html`.** Call at top of inline `<script>` block; it self-redirects.
+- **`requireAuth()` on all pages except `index.html`.** On pages that load a page-specific JS file (e.g. `library.html`), put the auth guard in a separate `<script>` block *before* the page JS `<script src>` tag, so the page JS never runs for unauthenticated users.
+- **Telegram Mini App:** feature-detect with `window.Telegram?.WebApp` — never assume it's present. Call `ready()` + `expand()` only when it exists. `initTelegram()` IIFE in `main.js` handles this.
 - **`setActiveDeck(id)` before navigating** to any study page; it updates `lastStudied`.
 
 ---
