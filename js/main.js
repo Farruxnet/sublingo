@@ -8,12 +8,19 @@ function navigateTo(page) {
 // ─── Active nav highlight ─────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   const path = window.location.pathname.split('/').pop() || 'index.html';
-  document.querySelectorAll('.nav-link[data-page]').forEach(link => {
+  document.querySelectorAll('.sl-nav-link[data-page]').forEach(link => {
     if (link.dataset.page === path) {
       link.classList.add('active');
       link.setAttribute('aria-current', 'page');
     }
   });
+
+  // Populate user chip in logged-in navbar if present
+  const userChip = document.getElementById('navUserChip');
+  if (userChip && isLoggedIn()) {
+    const email = getUserEmail();
+    userChip.textContent = email === 'Guest' ? 'Guest' : email.split('@')[0];
+  }
 });
 
 // ─── CEFR badge class ─────────────────────────────────────────────────────────
@@ -33,33 +40,37 @@ function posBadgeClass(pos) {
 
 // ─── SVG progress ring ────────────────────────────────────────────────────────
 function progressRingSVG(learned, total, size = 48, stroke = 4) {
-  const pct    = total > 0 ? learned / total : 0;
-  const r      = (size - stroke) / 2;
-  const circ   = 2 * Math.PI * r;
-  const dash   = (pct * circ).toFixed(1);
-  const cx     = size / 2;
+  const pct  = total > 0 ? learned / total : 0;
+  const r    = (size - stroke) / 2;
+  const circ = 2 * Math.PI * r;
+  const dash = (pct * circ).toFixed(1);
+  const cx   = size / 2;
   return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" fill="none" aria-hidden="true">
     <circle cx="${cx}" cy="${cx}" r="${r}" stroke="var(--sl-line)" stroke-width="${stroke}"/>
     <circle cx="${cx}" cy="${cx}" r="${r}" stroke="var(--sl-primary)" stroke-width="${stroke}"
-      stroke-dasharray="${dash} ${circ.toFixed(1)}"
-      stroke-dashoffset="0"
-      stroke-linecap="round"
-      transform="rotate(-90 ${cx} ${cx})"/>
+      stroke-dasharray="${dash} ${circ.toFixed(1)}" stroke-dashoffset="0"
+      stroke-linecap="round" transform="rotate(-90 ${cx} ${cx})"/>
   </svg>`;
 }
 
-// ─── CEFR range from word array ───────────────────────────────────────────────
+// ─── CEFR range ───────────────────────────────────────────────────────────────
 function cefrRange(words) {
   if (!words || words.length === 0) return '—';
-  const order = ['A1','A2','B1','B2','C1','C2'];
-  const levels = words.map(w => w.level).filter(Boolean);
-  const sorted = [...new Set(levels)].sort((a,b) => order.indexOf(a) - order.indexOf(b));
-  return sorted.length > 1 ? `${sorted[0]}–${sorted[sorted.length-1]}` : sorted[0] || '—';
+  const order  = ['A1','A2','B1','B2','C1','C2'];
+  const levels = [...new Set(words.map(w => w.level).filter(Boolean))]
+    .sort((a, b) => order.indexOf(a) - order.indexOf(b));
+  return levels.length > 1 ? `${levels[0]}–${levels[levels.length - 1]}` : levels[0] || '—';
 }
 
-// ─── Audio (Web Speech API stub) ─────────────────────────────────────────────
-// TODO: replace with real TTS endpoint (e.g. ElevenLabs, Google TTS)
+// ─── Audio ────────────────────────────────────────────────────────────────────
+// TODO: replace with GET /api/tts?word=<w>&lang=en-US → MP3; fall back to Web Speech API
+const _ttsCache = {};
 function playWordAudio(word) {
+  if (_ttsCache[word.toLowerCase()]) {
+    _ttsCache[word.toLowerCase()].cloneNode().play();
+    return;
+  }
+  // TODO: try fetch('/api/tts?word=' + encodeURIComponent(word) + '&lang=en-US') first
   if ('speechSynthesis' in window) {
     window.speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(word);
@@ -73,8 +84,8 @@ function playWordAudio(word) {
 function showToast(message, type = 'success') {
   const container = document.getElementById('toast-container');
   if (!container) return;
-  const id = 'toast-' + Date.now();
-  const icons = { success:'bi-check-circle-fill', danger:'bi-x-circle-fill', info:'bi-info-circle-fill' };
+  const id    = 'toast-' + Date.now();
+  const icons = { success:'bi-check-circle-fill', danger:'bi-x-circle-fill', info:'bi-info-circle-fill', warning:'bi-exclamation-circle-fill' };
   container.insertAdjacentHTML('beforeend', `
     <div id="${id}" class="toast sl-toast align-items-center border-0" role="alert" aria-live="assertive" data-type="${type}">
       <div class="d-flex align-items-center gap-2 px-3 py-2">
@@ -88,7 +99,24 @@ function showToast(message, type = 'success') {
   el.addEventListener('hidden.bs.toast', () => el.remove());
 }
 
-// ─── Confirm dialog (inline Bootstrap modal alternative) ─────────────────────
+// ─── Skeleton loader helpers ──────────────────────────────────────────────────
+function showSkeleton(containerId, rows = 3) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = Array.from({ length: rows }, () => `
+    <div class="skeleton-card mb-3">
+      <div class="skel skel-title"></div>
+      <div class="skel skel-line"></div>
+      <div class="skel skel-line skel-short"></div>
+    </div>`).join('');
+}
+
+function hideSkeleton(containerId) {
+  const el = document.getElementById(containerId);
+  if (el) el.innerHTML = '';
+}
+
+// ─── Confirm dialog ───────────────────────────────────────────────────────────
 function confirmAction(message, onConfirm) {
   const id = 'confirm-' + Date.now();
   document.body.insertAdjacentHTML('beforeend', `
@@ -99,25 +127,24 @@ function confirmAction(message, onConfirm) {
             <p class="mb-0 fw-medium" style="color:var(--sl-ink);">${message}</p>
           </div>
           <div class="modal-footer border-0 pt-0 pb-3 px-4 gap-2">
-            <button class="btn btn-ghost-sm flex-fill" data-bs-dismiss="modal">Cancel</button>
-            <button class="btn btn-danger-sm flex-fill" id="${id}-confirm">Delete</button>
+            <button class="btn-ghost-sm flex-fill" data-bs-dismiss="modal">Cancel</button>
+            <button class="btn-danger-sm flex-fill" id="${id}-confirm">Delete</button>
           </div>
         </div>
       </div>
     </div>`);
-  const el  = document.getElementById(id);
-  const m   = new bootstrap.Modal(el);
-  document.getElementById(`${id}-confirm`).addEventListener('click', () => {
-    m.hide();
-    onConfirm();
-  });
+  const el = document.getElementById(id);
+  const m  = new bootstrap.Modal(el);
+  document.getElementById(`${id}-confirm`).addEventListener('click', () => { m.hide(); onConfirm(); });
   el.addEventListener('hidden.bs.modal', () => el.remove());
   m.show();
 }
 
-// ─── Anonymous user ID ────────────────────────────────────────────────────────
-function getAnonymousId() {
-  let id = localStorage.getItem('sublingo_uid');
-  if (!id) { id = crypto.randomUUID(); localStorage.setItem('sublingo_uid', id); }
-  return id;
+// ─── HTML escape ──────────────────────────────────────────────────────────────
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }

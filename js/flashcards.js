@@ -64,7 +64,7 @@ function rateCard(rating) {
   const word = deck.words[currentIndex];
   ratings[word.id] = rating;
 
-  // TODO: POST to /api/srs/rate with { wordId, userId, rating, timestamp } for FSRS scheduling
+  // TODO: POST to /api/srs/rate with { wordId, deckId: deck.id, userId: getAnonymousId(), rating, timestamp } for FSRS scheduling
   console.log(`[SRS stub] "${word.word}" rated: ${rating}`);
 
   if (rating === 'easy') {

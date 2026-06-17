@@ -111,11 +111,11 @@ function checkAnswer(btn, optIndex) {
   if (!isCorrect) {
     btn.classList.add('wrong');
     wrongAnswers.push(word);
-    // TODO: POST to /api/test/answer { wordId, userId, correct: false, timestamp }
+    // TODO: POST to /api/test/answer { wordId, deckId: deck.id, userId: getAnonymousId(), correct: false, timestamp }
     console.log(`[Test] Wrong — "${word.word}", correct: "${correctAnswer}"`);
   } else {
     score++;
-    // TODO: POST to /api/test/answer { wordId, userId, correct: true, timestamp }
+    // TODO: POST to /api/test/answer { wordId, deckId: deck.id, userId: getAnonymousId(), correct: true, timestamp }
     console.log(`[Test] Correct — "${word.word}"`);
   }
 

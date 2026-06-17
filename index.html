@@ -8,183 +8,124 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
-<body>
+<body class="landing-body">
 
-<!-- ── Navbar ────────────────────────────────────────────────────────────── -->
-<nav class="sl-navbar sticky-top">
+<!-- ── Landing navbar (transparent, absolute) ────────────────────────────── -->
+<nav class="landing-nav">
   <div class="container d-flex align-items-center justify-content-between" style="max-width:1100px;">
     <a class="sl-brand" href="index.html">
       <span class="sl-brand-mark"><i class="bi bi-translate"></i></span>
       SubLingo
     </a>
-    <button class="navbar-toggler border-0 d-md-none" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" style="background:none;">
-      <i class="bi bi-list fs-5" style="color:var(--sl-ink);"></i>
-    </button>
-    <div class="collapse navbar-collapse d-md-flex justify-content-end" id="mainNav">
-      <nav class="d-flex gap-1 mt-2 mt-md-0">
-        <a class="sl-nav-link" href="index.html"      data-page="index.html"><i class="bi bi-grid me-1"></i>Library</a>
-        <a class="sl-nav-link" href="words.html"      data-page="words.html"><i class="bi bi-list-ul me-1"></i>Words</a>
-        <a class="sl-nav-link" href="flashcards.html" data-page="flashcards.html"><i class="bi bi-card-text me-1"></i>Flashcards</a>
-        <a class="sl-nav-link" href="test.html"       data-page="test.html"><i class="bi bi-patch-question me-1"></i>Test</a>
-      </nav>
-    </div>
+    <a href="#login" class="btn-ghost-sm">Log in</a>
   </div>
 </nav>
 
-<main style="max-width:1100px; margin:0 auto; padding:0 1.25rem;">
-
-  <!-- ── Hero ──────────────────────────────────────────────────────────────── -->
-  <section class="sl-hero">
+<!-- ── Hero ──────────────────────────────────────────────────────────────── -->
+<section class="landing-hero">
+  <div class="container" style="max-width:1100px;">
     <div class="row align-items-center g-5">
-      <div class="col-lg-7">
-        <div class="sl-hero__eyebrow">
+
+      <!-- Left: copy + CTA -->
+      <div class="col-lg-6">
+        <div class="landing-hero__kicker">
           <i class="bi bi-stars"></i> AI-powered vocabulary
         </div>
-        <h1 class="sl-hero__headline">
-          Learn English from what you <span class="underline-accent"><em>actually</em></span> watch.
+        <h1 class="landing-hero__h1">
+          Learn the words that appear in what you <em>actually</em> watch.
         </h1>
-        <p class="sl-hero__sub">
-          Upload any subtitle file, extract words worth learning, and study them with flashcards and quizzes — with Uzbek translations.
+        <p class="landing-hero__sub">
+          Upload any subtitle file, extract vocabulary worth learning, and master it with flashcards and quizzes — with Uzbek translations.
         </p>
-        <button class="btn-primary-sl" data-bs-toggle="modal" data-bs-target="#newDeckModal">
-          <i class="bi bi-plus-lg"></i> New deck
-        </button>
-      </div>
-      <div class="col-lg-5 d-none d-lg-block">
-        <!-- Sample word chips — purely decorative -->
-        <div class="sl-word-chips justify-content-center">
-          <div class="sl-chip"><strong>reluctant</strong><span class="chip-uz">istamasdan</span></div>
-          <div class="sl-chip"><strong>inevitable</strong><span class="chip-uz">muqarrar</span></div>
-          <div class="sl-chip"><strong>persuade</strong><span class="chip-uz">ishontirmoq</span></div>
-          <div class="sl-chip"><strong>diligent</strong><span class="chip-uz">mehnatsevar</span></div>
-          <div class="sl-chip"><strong>acquire</strong><span class="chip-uz">orttirmoq</span></div>
-          <div class="sl-chip"><strong>curious</strong><span class="chip-uz">qiziquvchan</span></div>
-          <div class="sl-chip"><strong>elaborate</strong><span class="chip-uz">murakkab</span></div>
-          <div class="sl-chip"><strong>apparent</strong><span class="chip-uz">ravshan</span></div>
+        <a href="#login" class="btn-primary-sl" style="font-size:var(--sl-text-base);padding:.75rem 2rem;">
+          Get started — it's free
+        </a>
+
+        <!-- Value loop -->
+        <div class="value-loop">
+          <div class="value-step"><i class="bi bi-file-earmark-text"></i> Subtitle</div>
+          <span class="value-arrow"><i class="bi bi-arrow-right"></i></span>
+          <div class="value-step"><i class="bi bi-list-ul"></i> Words</div>
+          <span class="value-arrow"><i class="bi bi-arrow-right"></i></span>
+          <div class="value-step"><i class="bi bi-card-text"></i> Flashcards</div>
+          <span class="value-arrow"><i class="bi bi-arrow-right"></i></span>
+          <div class="value-step"><i class="bi bi-patch-check"></i> Test</div>
         </div>
       </div>
-    </div>
-  </section>
 
-  <!-- ── Library ───────────────────────────────────────────────────────────── -->
-  <section class="pb-5">
-    <div class="d-flex align-items-center justify-content-between mb-4">
-      <h2 style="font-size:var(--sl-text-lg);margin:0;">Your decks</h2>
-      <button class="btn-ghost-sm" data-bs-toggle="modal" data-bs-target="#newDeckModal">
-        <i class="bi bi-plus"></i> New deck
-      </button>
-    </div>
+      <!-- Right: login card -->
+      <div class="col-lg-5 offset-lg-1 d-flex justify-content-center" id="login">
+        <div class="login-card">
+          <div class="login-card__title">Welcome back</div>
+          <p class="login-card__sub">Sign in to access your decks and study progress.</p>
 
-    <!-- Deck grid — rendered by JS -->
-    <div class="row g-3" id="deckGrid"></div>
+          <!-- TODO: replace with real auth (e.g. Supabase, Firebase, custom JWT) -->
+          <form id="loginForm" novalidate>
+            <div class="mb-3">
+              <label class="sl-label" for="emailInput">Email address</label>
+              <input type="email" id="emailInput" class="sl-input" placeholder="you@example.com" autocomplete="email" />
+              <div id="emailError" class="d-none mt-1" style="font-size:var(--sl-text-xs);color:var(--sl-danger);">
+                Please enter a valid email address.
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="sl-label" for="passwordInput">Password</label>
+              <input type="password" id="passwordInput" class="sl-input" placeholder="••••••••" autocomplete="current-password" />
+            </div>
+            <button type="submit" class="btn-primary-sl w-100 justify-content-center">
+              <i class="bi bi-box-arrow-in-right"></i> Log in
+            </button>
+          </form>
 
-    <!-- Empty state (no decks) -->
-    <div id="emptyLibrary" class="sl-empty d-none">
-      <div class="sl-empty__icon"><i class="bi bi-collection"></i></div>
-      <h3 class="sl-empty__title">No decks yet</h3>
-      <p class="sl-empty__body">Upload a subtitle file to extract vocabulary and create your first deck.</p>
-      <button class="btn-primary-sl" data-bs-toggle="modal" data-bs-target="#newDeckModal">
-        <i class="bi bi-plus-lg"></i> New deck
-      </button>
-    </div>
-  </section>
+          <div class="login-divider">or</div>
 
-</main>
-
-<!-- ── New Deck Modal ────────────────────────────────────────────────────── -->
-<div class="modal fade sl-modal" id="newDeckModal" tabindex="-1" aria-labelledby="newDeckTitle" aria-modal="true">
-  <div class="modal-dialog modal-dialog-centered" style="max-width:520px;">
-    <div class="modal-content">
-      <div class="modal-header border-0 pb-0 px-4 pt-4">
-        <h2 class="modal-title" id="newDeckTitle" style="font-size:var(--sl-text-lg);margin:0;">New deck</h2>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body px-4 py-3">
-
-        <!-- Source tabs -->
-        <div class="sl-pill-tabs mb-3" role="tablist">
-          <button class="sl-pill-tab active" id="tab-file-btn" role="tab" aria-selected="true"  onclick="switchTab('file')">
-            <i class="bi bi-file-earmark-text me-1"></i>File
+          <button class="btn-guest" id="guestBtn" type="button">
+            <i class="bi bi-person"></i> Continue as Guest
           </button>
-          <button class="sl-pill-tab"        id="tab-paste-btn" role="tab" aria-selected="false" onclick="switchTab('paste')">
-            <i class="bi bi-clipboard me-1"></i>Paste
-          </button>
-          <button class="sl-pill-tab" disabled style="opacity:.45;">
-            <i class="bi bi-youtube me-1"></i>YouTube
-            <span style="font-size:.65rem;background:var(--sl-line);border-radius:4px;padding:.05rem .35rem;margin-left:.25rem;color:var(--sl-muted);">soon</span>
-          </button>
-        </div>
 
-        <!-- File pane -->
-        <div id="pane-file">
-          <!-- TODO: wire showFileSelected() → FileReader API → read real subtitle content -->
-          <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
-            <div class="upload-zone__icon"><i class="bi bi-cloud-arrow-up"></i></div>
-            <div class="upload-zone__title">Drag & drop or click to choose</div>
-            <div class="upload-zone__hint">.srt and .vtt — up to 5 MB</div>
-            <input type="file" id="fileInput" accept=".srt,.vtt,.txt" class="d-none" />
-          </div>
-          <div id="fileInfo" class="d-none mt-2" style="font-size:var(--sl-text-xs);color:var(--sl-primary);">
-            <i class="bi bi-file-check me-1"></i><span id="fileName"></span>
-          </div>
+          <p style="font-size:var(--sl-text-xs);color:var(--sl-muted);text-align:center;margin-top:1.125rem;margin-bottom:0;">
+            No account yet? Guest mode saves your decks locally in this browser.
+          </p>
         </div>
-
-        <!-- Paste pane -->
-        <div id="pane-paste" class="d-none">
-          <!-- TODO: wire real text → /api/extract -->
-          <textarea id="pasteText" class="sl-input" rows="5" placeholder="Paste subtitle text or any English text here…" style="resize:vertical;"></textarea>
-        </div>
-
-        <!-- Deck name -->
-        <div class="mt-3">
-          <label class="sl-label" for="deckNameInput">Deck name</label>
-          <input type="text" id="deckNameInput" class="sl-input" placeholder="e.g. Friends S01E01" maxlength="60" />
-        </div>
-
-        <!-- CEFR filter hint -->
-        <div class="mt-2">
-          <label class="sl-label" for="deckLevelSelect">Target level (for word extraction)</label>
-          <select id="deckLevelSelect" class="sl-input sl-select">
-            <option value="">All levels</option>
-            <option value="A2">A2 — Elementary</option>
-            <option value="B1" selected>B1 — Intermediate</option>
-            <option value="B2">B2 — Upper-Intermediate</option>
-          </select>
-        </div>
-
       </div>
-      <div class="modal-footer border-0 px-4 pb-4 pt-1 gap-2">
-        <button class="btn-ghost flex-fill" data-bs-dismiss="modal">Cancel</button>
-        <!-- TODO: handleCreateDeck() → read file → POST /api/extract → createDeck(name, source, words) -->
-        <button class="btn-primary-sl flex-fill justify-content-center" onclick="handleCreateDeck()">
-          <i class="bi bi-magic"></i> Create deck
-        </button>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── Feature strip ─────────────────────────────────────────────────────── -->
+<section style="background:var(--sl-surface);border-top:1px solid var(--sl-line);padding:3.5rem 0;">
+  <div class="container" style="max-width:1100px;">
+    <div class="row g-4 text-center">
+      <div class="col-6 col-md-3">
+        <div style="font-size:1.75rem;color:var(--sl-primary);margin-bottom:.5rem;"><i class="bi bi-cloud-upload"></i></div>
+        <div style="font-weight:600;font-size:var(--sl-text-sm);">Upload subtitles</div>
+        <div style="font-size:var(--sl-text-xs);color:var(--sl-muted);">.srt, .vtt, or paste text</div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div style="font-size:1.75rem;color:var(--sl-primary);margin-bottom:.5rem;"><i class="bi bi-magic"></i></div>
+        <div style="font-weight:600;font-size:var(--sl-text-sm);">AI extracts words</div>
+        <div style="font-size:var(--sl-text-xs);color:var(--sl-muted);">Smart CEFR-level filtering</div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div style="font-size:1.75rem;color:var(--sl-primary);margin-bottom:.5rem;"><i class="bi bi-card-text"></i></div>
+        <div style="font-weight:600;font-size:var(--sl-text-sm);">Study flashcards</div>
+        <div style="font-size:var(--sl-text-xs);color:var(--sl-muted);">Flip cards with Uzbek translations</div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div style="font-size:1.75rem;color:var(--sl-primary);margin-bottom:.5rem;"><i class="bi bi-trophy"></i></div>
+        <div style="font-weight:600;font-size:var(--sl-text-sm);">Test yourself</div>
+        <div style="font-size:var(--sl-text-xs);color:var(--sl-muted);">Multiple-choice with instant feedback</div>
       </div>
     </div>
   </div>
-</div>
-
-<!-- ── Rename Modal ───────────────────────────────────────────────────────── -->
-<div class="modal fade sl-modal" id="renameDeckModal" tabindex="-1" aria-modal="true">
-  <div class="modal-dialog modal-dialog-centered modal-sm">
-    <div class="modal-content">
-      <div class="modal-body p-4">
-        <label class="sl-label" for="renameInput">Rename deck</label>
-        <input type="text" id="renameInput" class="sl-input" maxlength="60" />
-      </div>
-      <div class="modal-footer border-0 pt-0 pb-3 px-4 gap-2">
-        <button class="btn-ghost-sm flex-fill" data-bs-dismiss="modal">Cancel</button>
-        <button class="btn-primary-sl btn-ghost-sm flex-fill justify-content-center" id="renameSaveBtn" style="background:var(--sl-primary);color:#fff;border:none;">Save</button>
-      </div>
-    </div>
-  </div>
-</div>
+</section>
 
 <!-- ── Footer ────────────────────────────────────────────────────────────── -->
 <footer>
   <div style="max-width:1100px;margin:0 auto;padding:0 1.25rem;">
     <strong style="font-family:'Fraunces',Georgia,serif;">SubLingo</strong>
-    &nbsp;·&nbsp; English–Uzbek vocabulary builder &nbsp;·&nbsp; MVP v0.2
+    &nbsp;·&nbsp; English–Uzbek vocabulary builder &nbsp;·&nbsp; MVP v0.3
   </div>
 </footer>
 
@@ -194,243 +135,34 @@
 <script src="js/mockData.js"></script>
 <script src="js/main.js"></script>
 <script>
-  // ── Render library ──────────────────────────────────────────────────────────
-  function renderLibrary() {
-    const decks = getDecks();
-    const grid  = document.getElementById('deckGrid');
-    const empty = document.getElementById('emptyLibrary');
-
-    if (decks.length === 0) {
-      grid.innerHTML = '';
-      empty.classList.remove('d-none');
-      return;
-    }
-    empty.classList.add('d-none');
-
-    grid.innerHTML = decks.map(deck => {
-      const { total, learned } = deck.stats;
-      const pct   = total > 0 ? Math.round(learned / total * 100) : 0;
-      const ring  = progressRingSVG(learned, total, 44, 4);
-      const range = cefrRange(deck.words);
-      const ago   = timeAgo(deck.createdAt);
-      return `
-        <div class="col-12 col-sm-6 col-xl-4">
-          <div class="deck-card" id="dc-${deck.id}" onclick="openDeck('${deck.id}')" role="button" tabindex="0"
-               onkeydown="if(event.key==='Enter')openDeck('${deck.id}')">
-            <div class="deck-card__header">
-              <div class="deck-card__name">${escapeHtml(deck.name)}</div>
-              <button class="deck-kebab" onclick="event.stopPropagation(); openKebab(event, '${deck.id}')"
-                      title="Options" aria-label="Deck options">
-                <i class="bi bi-three-dots-vertical"></i>
-              </button>
-            </div>
-            <div class="deck-card__meta">
-              <span class="badge-other" style="font-size:.7rem;">${escapeHtml(deck.source)}</span>
-              <span class="badge-b">${range}</span>
-              <span style="font-size:var(--sl-text-xs);color:var(--sl-muted);">${ago}</span>
-            </div>
-            <div class="deck-card__footer">
-              <div class="deck-card__progress-label">
-                <span style="font-weight:600;color:var(--sl-ink);">${learned}</span> / ${total} learned
-                <span style="margin-left:.5rem;color:var(--sl-primary);font-weight:600;">${pct}%</span>
-              </div>
-              <div class="deck-card__ring">${ring}</div>
-            </div>
-          </div>
-        </div>`;
-    }).join('') + `
-      <div class="col-12 col-sm-6 col-xl-4">
-        <button class="deck-card-new w-100 h-100" data-bs-toggle="modal" data-bs-target="#newDeckModal"
-                style="border:none;min-height:148px;">
-          <i class="bi bi-plus-circle" style="font-size:1.5rem;"></i>
-          <span style="font-size:var(--sl-text-sm);font-weight:500;">New deck</span>
-        </button>
-      </div>`;
+  // Redirect already-logged-in users straight to the library
+  if (isLoggedIn()) {
+    window.location.replace('library.html');
   }
 
-  function openDeck(id) {
-    setActiveDeck(id);
-    navigateTo('words.html');
-  }
-
-  function escapeHtml(s) {
-    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-
-  // ── Kebab context menu ──────────────────────────────────────────────────────
-  let kebabDeckId = null;
-
-  function openKebab(e, deckId) {
-    e.stopPropagation();
-    kebabDeckId = deckId;
-    closeKebab();
-
-    const deck = getDeckById(deckId);
-    const menu = document.createElement('div');
-    menu.id = 'kebab-menu';
-    menu.style.cssText = `position:fixed;z-index:9000;background:var(--sl-surface);
-      border:1px solid var(--sl-line);border-radius:var(--sl-radius-sm);
-      box-shadow:var(--sl-shadow-md);padding:.375rem;min-width:160px;`;
-
-    const items = [
-      { icon:'bi-eye',        label:'Open',   fn:`openDeck('${deckId}')` },
-      { icon:'bi-card-text',  label:'Study',  fn:`studyDeck('${deckId}')` },
-      { icon:'bi-patch-question', label:'Test', fn:`testDeck('${deckId}')` },
-      { icon:'bi-pencil',     label:'Rename', fn:`showRenameModal('${deckId}')` },
-      { icon:'bi-trash',      label:'Delete', fn:`confirmDeleteDeck('${deckId}')`, danger:true },
-    ];
-
-    menu.innerHTML = items.map(it => `
-      <button onclick="${it.fn};closeKebab();" style="
-        display:flex;align-items:center;gap:.5rem;width:100%;border:none;background:none;
-        padding:.425rem .75rem;border-radius:6px;font-size:var(--sl-text-xs);font-weight:500;
-        color:${it.danger ? 'var(--sl-danger)' : 'var(--sl-ink)'};cursor:pointer;text-align:left;
-        transition:background .1s;"
-        onmouseover="this.style.background='var(--sl-soft)'"
-        onmouseout="this.style.background='none'">
-        <i class="bi ${it.icon}"></i>${it.label}
-      </button>`).join('');
-
-    document.body.appendChild(menu);
-
-    // Position below button
-    const rect = e.currentTarget.getBoundingClientRect();
-    const menuW = 168;
-    let left = rect.right - menuW;
-    let top  = rect.bottom + 4;
-    if (left < 8) left = 8;
-    if (top + 200 > window.innerHeight) top = rect.top - 204;
-    menu.style.left = left + 'px';
-    menu.style.top  = top  + 'px';
-
-    setTimeout(() => document.addEventListener('click', closeKebab, { once:true }), 10);
-  }
-
-  function closeKebab() {
-    document.getElementById('kebab-menu')?.remove();
-  }
-
-  function studyDeck(id) {
-    setActiveDeck(id);
-    navigateTo('flashcards.html');
-  }
-
-  function testDeck(id) {
-    setActiveDeck(id);
-    navigateTo('test.html');
-  }
-
-  function showRenameModal(id) {
-    const deck = getDeckById(id);
-    if (!deck) return;
-    document.getElementById('renameInput').value = deck.name;
-
-    const modal = new bootstrap.Modal(document.getElementById('renameDeckModal'));
-    document.getElementById('renameSaveBtn').onclick = () => {
-      const name = document.getElementById('renameInput').value.trim();
-      if (name) { renameDeck(id, name); renderLibrary(); showToast('Deck renamed', 'success'); }
-      modal.hide();
-    };
-    modal.show();
-    setTimeout(() => document.getElementById('renameInput').select(), 300);
-  }
-
-  function confirmDeleteDeck(id) {
-    const deck = getDeckById(id);
-    if (!deck) return;
-    confirmAction(`Delete "<strong>${escapeHtml(deck.name)}</strong>"? This can't be undone.`, () => {
-      deleteDeck(id);
-      renderLibrary();
-      showToast('Deck deleted', 'info');
-    });
-  }
-
-  // ── Upload / create deck flow ───────────────────────────────────────────────
-  let activeTab     = 'file';
-  let pickedFile    = null;
-  let pickedName    = '';
-
-  function switchTab(tab) {
-    activeTab = tab;
-    document.getElementById('pane-file').classList.toggle('d-none', tab !== 'file');
-    document.getElementById('pane-paste').classList.toggle('d-none', tab !== 'paste');
-    document.getElementById('tab-file-btn').classList.toggle('active', tab === 'file');
-    document.getElementById('tab-paste-btn').classList.toggle('active', tab === 'paste');
-  }
-
-  const dropZone  = document.getElementById('dropZone');
-  const fileInput = document.getElementById('fileInput');
-  const fileInfo  = document.getElementById('fileInfo');
-  const fileNameEl = document.getElementById('fileName');
-
-  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
-  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
-  dropZone.addEventListener('drop', e => {
+  document.getElementById('loginForm').addEventListener('submit', e => {
     e.preventDefault();
-    dropZone.classList.remove('dragover');
-    if (e.dataTransfer.files[0]) showFileSelected(e.dataTransfer.files[0]);
-  });
+    const email = document.getElementById('emailInput').value.trim();
+    const errEl = document.getElementById('emailError');
 
-  fileInput.addEventListener('change', () => {
-    if (fileInput.files[0]) showFileSelected(fileInput.files[0]);
-  });
-
-  function showFileSelected(file) {
-    // TODO: use FileReader API here to actually read file.text() → pass to /api/extract
-    pickedFile = file;
-    pickedName = file.name.replace(/\.[^.]+$/, '');
-    fileNameEl.textContent = `${file.name} (${(file.size/1024).toFixed(1)} KB)`;
-    fileInfo.classList.remove('d-none');
-    const nameInput = document.getElementById('deckNameInput');
-    if (!nameInput.value) nameInput.value = pickedName;
-  }
-
-  function handleCreateDeck() {
-    // TODO: replace mock words with real /api/extract response
-    // 1. Read file: const text = await file.text();  (or use pasteText textarea)
-    // 2. POST /api/extract → { words: Word[] }
-    // 3. Pass words to createDeck() below
-
-    const name   = document.getElementById('deckNameInput').value.trim();
-    const source = pickedFile ? pickedFile.name
-                 : (activeTab === 'paste' && document.getElementById('pasteText').value.trim()) ? 'Pasted text'
-                 : null;
-
-    if (!name) {
-      document.getElementById('deckNameInput').focus();
-      showToast('Please enter a deck name', 'danger');
+    // Basic email validation
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      errEl.classList.remove('d-none');
+      document.getElementById('emailInput').focus();
       return;
     }
-    if (!source) {
-      showToast('Add a file or paste some text first', 'danger');
-      return;
-    }
+    errEl.classList.add('d-none');
 
-    // Use a random half of SEED_WORDS_A + SEED_WORDS_B as mock content for new decks
-    const allSeed = [...SEED_WORDS_A, ...SEED_WORDS_B].sort(() => Math.random() - 0.5).slice(0, 8);
-    const deck = createDeck(name, source, allSeed);
-    setActiveDeck(deck.id);
+    // TODO: replace with real auth API call
+    loginUser(email || 'Guest');
+    window.location.replace('library.html');
+  });
 
-    bootstrap.Modal.getInstance(document.getElementById('newDeckModal')).hide();
-    resetModal();
-    renderLibrary();
-    showToast(`"${name}" created`, 'success');
-  }
-
-  function resetModal() {
-    pickedFile = null;
-    pickedName = '';
-    document.getElementById('deckNameInput').value = '';
-    document.getElementById('fileInfo').classList.add('d-none');
-    document.getElementById('pasteText').value = '';
-    fileInput.value = '';
-    switchTab('file');
-  }
-
-  document.getElementById('newDeckModal').addEventListener('hidden.bs.modal', resetModal);
-
-  // Initial render
-  renderLibrary();
+  document.getElementById('guestBtn').addEventListener('click', () => {
+    // TODO: offer optional account creation prompt here before continuing as guest
+    loginUser('');
+    window.location.replace('library.html');
+  });
 </script>
 </body>
 </html>

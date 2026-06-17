@@ -13,23 +13,36 @@
 <!-- ── Navbar ────────────────────────────────────────────────────────────── -->
 <nav class="sl-navbar sticky-top">
   <div class="container d-flex align-items-center justify-content-between" style="max-width:1100px;">
-    <a class="sl-brand" href="index.html">
+    <a class="sl-brand" href="library.html">
       <span class="sl-brand-mark"><i class="bi bi-translate"></i></span>
       SubLingo
     </a>
     <button class="navbar-toggler border-0 d-md-none" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" style="background:none;">
       <i class="bi bi-list fs-5" style="color:var(--sl-ink);"></i>
     </button>
-    <div class="collapse navbar-collapse d-md-flex justify-content-end" id="mainNav">
+    <div class="collapse navbar-collapse d-md-flex align-items-center justify-content-end gap-2" id="mainNav">
       <nav class="d-flex gap-1 mt-2 mt-md-0">
-        <a class="sl-nav-link" href="index.html"      data-page="index.html"><i class="bi bi-grid me-1"></i>Library</a>
+        <a class="sl-nav-link" href="library.html"    data-page="library.html"><i class="bi bi-grid me-1"></i>Library</a>
         <a class="sl-nav-link" href="words.html"      data-page="words.html"><i class="bi bi-list-ul me-1"></i>Words</a>
         <a class="sl-nav-link" href="flashcards.html" data-page="flashcards.html"><i class="bi bi-card-text me-1"></i>Flashcards</a>
         <a class="sl-nav-link" href="test.html"       data-page="test.html"><i class="bi bi-patch-question me-1"></i>Test</a>
       </nav>
+      <div class="d-flex align-items-center gap-2 ms-md-2 mt-2 mt-md-0">
+        <span class="nav-user-chip"><i class="bi bi-person-circle"></i><span id="navUserChip">…</span></span>
+        <button class="nav-logout-btn" onclick="handleLogout()" title="Log out"><i class="bi bi-box-arrow-right"></i></button>
+      </div>
     </div>
   </div>
 </nav>
+
+<!-- ── Study tab bar ─────────────────────────────────────────────────────── -->
+<div class="study-tabs">
+  <a href="words.html"      class="study-tab"><i class="bi bi-list-ul"></i> Words</a>
+  <a href="flashcards.html" class="study-tab active"><i class="bi bi-card-text"></i> Flashcards</a>
+  <a href="test.html"       class="study-tab"><i class="bi bi-patch-question"></i> Test</a>
+  <span class="study-tab ms-auto" id="activeDeckTab"
+        style="color:var(--sl-muted);cursor:default;font-weight:400;font-style:italic;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+</div>
 
 <main class="container py-4" style="max-width:640px;">
 
@@ -37,46 +50,46 @@
   <div id="noDeckScreen" class="sl-empty d-none">
     <div class="sl-empty__icon"><i class="bi bi-collection"></i></div>
     <h2 class="sl-empty__title">No deck selected</h2>
-    <p class="sl-empty__body">Go to the library, open a deck, then come back to study.</p>
-    <a href="index.html" class="btn-primary-sl">Back to Library</a>
+    <p class="sl-empty__body">Go to your library, open a deck, then come back to study.</p>
+    <a href="library.html" class="btn-primary-sl">Back to Library</a>
   </div>
 
   <!-- ── Study screen ──────────────────────────────────────────────────────── -->
   <div id="studyScreen">
-
-    <!-- Header: deck name + counter -->
     <div class="d-flex align-items-center justify-content-between mb-2">
-      <a href="words.html" class="d-flex align-items-center gap-1"
-         style="font-size:var(--sl-text-xs);color:var(--sl-muted);text-decoration:none;">
+      <a href="words.html"
+         style="font-size:var(--sl-text-xs);color:var(--sl-muted);text-decoration:none;display:inline-flex;align-items:center;gap:.3rem;">
         <i class="bi bi-arrow-left"></i>
         <span id="deckLabel" style="font-weight:500;color:var(--sl-ink);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
       </a>
       <span style="font-size:var(--sl-text-xs);font-weight:600;color:var(--sl-muted);" id="cardCounter">1 / —</span>
     </div>
 
-    <!-- Progress bar -->
     <div class="sl-progress mb-4">
       <div class="sl-progress-bar" id="progressBar" style="width:0%;"></div>
     </div>
 
     <!-- Flashcard -->
     <div class="flashcard-scene mb-2">
-      <div class="flashcard" id="flashcard" onclick="flipCard()" role="button" tabindex="0"
-           aria-label="Flashcard — click to flip"
+      <div class="flashcard" id="flashcard"
+           onclick="flipCard()" role="button" tabindex="0"
+           aria-label="Flashcard — click or press Space to flip"
            onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();flipCard();}">
         <!-- Front -->
         <div class="flashcard-face flashcard-front">
           <div class="text-center w-100">
             <div class="d-flex align-items-center justify-content-center gap-2 mb-1">
               <span class="flashcard-front__word" id="cardWord">—</span>
-              <button class="btn-audio" id="audioBtn" title="Pronounce" style="flex-shrink:0;">
-                <i class="bi bi-volume-up"></i>
+              <button class="btn-audio" id="audioBtn" title="Pronounce" aria-label="Pronounce word">
+                <i class="bi bi-volume-up" aria-hidden="true"></i>
               </button>
             </div>
             <div class="flashcard-front__ipa" id="cardIpa"></div>
             <div class="mt-2" id="cardPosLevel"></div>
             <div class="mt-4 flip-hint">
-              <i class="bi bi-hand-index me-1"></i>Tap to reveal translation
+              <i class="bi bi-hand-index me-1" aria-hidden="true"></i>Tap to reveal
+              &nbsp;·&nbsp;
+              <kbd style="font-size:.7rem;padding:.1rem .3rem;border-radius:4px;border:1px solid var(--sl-line);background:var(--sl-soft);">Space</kbd>
             </div>
           </div>
         </div>
@@ -91,37 +104,33 @@
       </div>
     </div>
 
-    <p class="flip-hint mb-3">
-      Tap the card to flip &nbsp;·&nbsp; Rate after seeing the answer
-      &nbsp;·&nbsp; <kbd style="font-size:.7rem;padding:.1rem .35rem;border-radius:4px;border:1px solid var(--sl-line);background:var(--sl-soft);">Space</kbd> to flip
-    </p>
+    <p class="flip-hint mb-3">Rate yourself after seeing the answer &nbsp;·&nbsp; 1/2/3 keys work too</p>
 
     <!-- Rating buttons -->
     <div class="d-flex justify-content-center gap-2 flex-wrap mb-4">
-      <button class="rating-btn rating-again" id="rateAgain">
-        <i class="bi bi-arrow-counterclockwise"></i> Again
+      <button class="rating-btn rating-again" id="rateAgain" aria-label="Again">
+        <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i> Again
       </button>
-      <button class="rating-btn rating-hard" id="rateHard">
-        <i class="bi bi-emoji-neutral"></i> Hard
+      <button class="rating-btn rating-hard" id="rateHard" aria-label="Hard">
+        <i class="bi bi-emoji-neutral" aria-hidden="true"></i> Hard
       </button>
-      <button class="rating-btn rating-easy" id="rateEasy">
-        <i class="bi bi-emoji-smile"></i> Easy
+      <button class="rating-btn rating-easy" id="rateEasy" aria-label="Easy">
+        <i class="bi bi-emoji-smile" aria-hidden="true"></i> Easy
       </button>
     </div>
 
     <!-- Prev / Skip -->
     <div class="d-flex justify-content-center gap-3">
       <button class="btn-ghost-sm" id="prevBtn" onclick="goBack()" disabled>
-        <i class="bi bi-chevron-left"></i> Previous
+        <i class="bi bi-chevron-left" aria-hidden="true"></i> Previous
       </button>
       <button class="btn-ghost-sm" onclick="advance()">
-        Skip <i class="bi bi-chevron-right"></i>
+        Skip <i class="bi bi-chevron-right" aria-hidden="true"></i>
       </button>
     </div>
+  </div>
 
-  </div><!-- /studyScreen -->
-
-  <!-- ── Completion screen ──────────────────────────────────────────────────── -->
+  <!-- ── Completion screen ─────────────────────────────────────────────────── -->
   <div id="completionScreen" class="d-none text-center py-4">
     <div class="result-circle mb-2">
       <i class="bi bi-trophy-fill" style="font-size:1.75rem;color:var(--sl-primary);"></i>
@@ -131,7 +140,6 @@
       You reviewed all <strong id="summaryTotal">0</strong> words in
       <strong id="summaryDeck"></strong>.
     </p>
-
     <div class="row g-3 justify-content-center mb-4 mt-2">
       <div class="col-4">
         <div class="sl-card p-3 text-center">
@@ -152,23 +160,15 @@
         </div>
       </div>
     </div>
-
     <div class="d-flex flex-wrap justify-content-center gap-2">
-      <button class="btn-ghost" onclick="restartDeck()">
-        <i class="bi bi-arrow-repeat"></i> Study again
-      </button>
-      <a href="test.html" class="btn-primary-sl">
-        <i class="bi bi-patch-question"></i> Take test
-      </a>
-      <a href="index.html" class="btn-ghost">
-        <i class="bi bi-grid"></i> Library
-      </a>
+      <button class="btn-ghost" onclick="restartDeck()"><i class="bi bi-arrow-repeat"></i> Study again</button>
+      <a href="test.html" class="btn-primary-sl"><i class="bi bi-patch-question"></i> Take test</a>
+      <a href="library.html" class="btn-ghost"><i class="bi bi-grid"></i> Library</a>
     </div>
   </div>
 
 </main>
 
-<!-- ── Footer ────────────────────────────────────────────────────────────── -->
 <footer>
   <div style="max-width:1100px;margin:0 auto;padding:0 1.25rem;">
     <strong style="font-family:'Fraunces',Georgia,serif;">SubLingo</strong>
@@ -183,21 +183,25 @@
 <script src="js/main.js"></script>
 <script src="js/flashcards.js"></script>
 <script>
+  if (!requireAuth()) { /* stops here */ }
+
+  function handleLogout() { logoutUser(); window.location.replace('index.html'); }
+
   document.addEventListener('DOMContentLoaded', () => {
     initDeck();
 
-    // Audio button uses addEventListener (no onclick + string in attribute)
+    const activeDeckTab = document.getElementById('activeDeckTab');
+    if (activeDeckTab && getActiveDeck()) activeDeckTab.textContent = getActiveDeck().name;
+
     document.getElementById('audioBtn').addEventListener('click', e => {
       e.stopPropagation();
       playWordAudio(document.getElementById('cardWord').textContent);
     });
 
-    // Rating buttons
     document.getElementById('rateAgain').addEventListener('click', () => rateCard('again'));
     document.getElementById('rateHard').addEventListener('click',  () => rateCard('hard'));
     document.getElementById('rateEasy').addEventListener('click',  () => rateCard('easy'));
 
-    // Keyboard shortcuts
     document.addEventListener('keydown', e => {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
       if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); flipCard(); }
