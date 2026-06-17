@@ -1078,61 +1078,6 @@ footer {
 .btn-provider:focus-visible { outline: 2px solid var(--sl-primary); outline-offset: 2px; }
 .btn-provider svg { flex-shrink: 0; }
 
-/* ─── Study app-bar (study pages only — replaces global navbar) ──────────────*/
-.study-appbar {
-  position: sticky;
-  top: 0;
-  z-index: 60;
-  background: rgba(251,250,247,.92);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--sl-line);
-  padding: 0 1.25rem;
-  height: 52px;
-  display: flex;
-  align-items: center;
-}
-
-[data-theme="dark"] .study-appbar { background: rgba(17,18,16,.92); }
-
-.study-appbar__inner {
-  width: 100%;
-  max-width: 1100px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 44px 1fr 44px;
-  align-items: center;
-  gap: .5rem;
-}
-
-.study-appbar__back {
-  width: 44px;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--sl-radius-sm);
-  color: var(--sl-ink);
-  text-decoration: none;
-  transition: background .12s;
-  flex-shrink: 0;
-}
-
-.study-appbar__back:hover { background: var(--sl-soft); color: var(--sl-ink); }
-.study-appbar__back:focus-visible { outline: 2px solid var(--sl-primary); outline-offset: 2px; }
-
-.study-appbar__title {
-  font-family: 'Fraunces', Georgia, serif;
-  font-weight: 600;
-  font-size: var(--sl-text-sm);
-  color: var(--sl-ink);
-  text-align: center;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  line-height: 1.2;
-}
-
 /* ─── Study tab bar ──────────────────────────────────────────────────────────*/
 .study-tabs {
   display: flex;
@@ -1141,7 +1086,7 @@ footer {
   background: var(--sl-surface);
   padding: 0 1.25rem;
   position: sticky;
-  top: 52px;
+  top: 57px;
   z-index: 50;
 }
 

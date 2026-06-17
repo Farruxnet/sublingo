@@ -22,10 +22,20 @@
       <span class="sl-brand-mark"><i class="bi bi-translate"></i></span>
       SubLingo
     </a>
-    <div class="d-flex align-items-center gap-2">
-      <button class="btn-theme" id="themeToggle" aria-label="Switch theme"><i class="bi bi-moon"></i></button>
-      <span class="nav-user-chip"><i class="bi bi-person-circle"></i><span id="navUserChip">…</span></span>
-      <button class="nav-logout-btn" id="logoutBtn" aria-label="Log out" title="Log out"><i class="bi bi-box-arrow-right"></i></button>
+    <button class="navbar-toggler border-0 d-md-none" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" style="background:none;">
+      <i class="bi bi-list fs-5" style="color:var(--sl-ink);"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="mainNav">
+      <div class="d-flex align-items-center justify-content-end gap-2 py-2 py-md-0">
+        <nav class="d-flex gap-1">
+          <a class="sl-nav-link" href="library.html" data-page="library.html"><i class="bi bi-grid me-1"></i>My Library</a>
+        </nav>
+        <div class="d-flex align-items-center gap-2">
+          <button class="btn-theme" id="themeToggle" aria-label="Switch theme"><i class="bi bi-moon"></i></button>
+          <span class="nav-user-chip"><i class="bi bi-person-circle"></i><span id="navUserChip">…</span></span>
+          <button class="nav-logout-btn" id="logoutBtn" aria-label="Log out" title="Log out"><i class="bi bi-box-arrow-right"></i></button>
+        </div>
+      </div>
     </div>
   </div>
 </nav>

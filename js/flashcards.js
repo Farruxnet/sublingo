@@ -49,7 +49,7 @@ function renderCard() {
   const pct = Math.round(currentIndex / deck.words.length * 100);
   document.getElementById('progressBar').style.width    = pct + '%';
   document.getElementById('cardCounter').textContent    = `${currentIndex + 1} / ${deck.words.length}`;
-  document.getElementById('studyAppbarTitle').textContent = deck.name;
+  document.getElementById('deckLabel').textContent      = deck.name;
 
   document.getElementById('prevBtn').disabled = currentIndex === 0;
 }
