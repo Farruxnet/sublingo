@@ -1,11 +1,30 @@
 // main.js — Shared utilities. Depends on mockData.js already loaded.
 
+// ─── Theme ────────────────────────────────────────────────────────────────────
+// initTheme() is called inline (before first paint) via a <script> in each page's <head>.
+function initTheme() {
+  const saved = localStorage.getItem('sublingo_theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const dark = saved ? saved === 'dark' : prefersDark;
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+}
+
+function toggleTheme() {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const next = isDark ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('sublingo_theme', next);
+  // Update toggle icon if present
+  const btn = document.getElementById('themeToggle');
+  if (btn) btn.setAttribute('aria-label', next === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+}
+
 // ─── Navigation ───────────────────────────────────────────────────────────────
 function navigateTo(page) {
   window.location.href = page;
 }
 
-// ─── Active nav highlight ─────────────────────────────────────────────────────
+// ─── Active nav highlight + user chip ────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   const path = window.location.pathname.split('/').pop() || 'index.html';
   document.querySelectorAll('.sl-nav-link[data-page]').forEach(link => {
@@ -15,11 +34,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Populate user chip in logged-in navbar if present
   const userChip = document.getElementById('navUserChip');
   if (userChip && isLoggedIn()) {
     const email = getUserEmail();
     userChip.textContent = email === 'Guest' ? 'Guest' : email.split('@')[0];
+  }
+
+  // Wire theme toggle
+  const themeBtn = document.getElementById('themeToggle');
+  if (themeBtn) {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    themeBtn.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+    themeBtn.addEventListener('click', toggleTheme);
   }
 });
 

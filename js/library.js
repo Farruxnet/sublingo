@@ -265,13 +265,11 @@ function resetModal() {
 
 document.getElementById('newDeckModal').addEventListener('hidden.bs.modal', resetModal);
 
-// ─── Logout ───────────────────────────────────────────────────────────────────
-function handleLogout() {
-  logoutUser();
-  window.location.replace('index.html');
-}
-
 // ─── Init ─────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    logoutUser();
+    window.location.replace('index.html');
+  });
   renderLibrary();
 });

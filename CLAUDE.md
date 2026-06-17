@@ -37,6 +37,8 @@ sublingo/
 Navigation flow: `index.html` → (login) → `library.html` → (openDeck) → `deck.html` → Words / Flashcards / Test.
 The `.study-tabs` bar inside study pages has a "← Deck" link back to `deck.html`.
 
+**Removed in v0.5 cleanup:** `.sl-hero*`, `.sl-word-chips`, `.sl-chip`, `.underline-accent`, `.sl-section-label` CSS rules (no HTML referenced them). Inline `<style>` block from `test.html` (moved `.feedback-correct/.feedback-wrong` to `style.css`). Per-deck nav links (Words/Flashcards/Test) removed from the global navbar — those live in `.study-tabs` and `deck.html` hub tiles only.
+
 Every HTML page loads scripts in this exact order: `mockData.js` → `main.js` → page-specific JS. Do not reorder; `mockData.js` must run first because all other scripts depend on `DECKS`, auth helpers, and other globals it defines.
 
 ---
@@ -99,6 +101,7 @@ Every HTML page loads scripts in this exact order: `mockData.js` → `main.js` �
 | Auth flag | `sublingo_loggedIn` | Yes | `sublingo_loggedIn` |
 | User email | `sublingo_email` | Yes | `sublingo_email` |
 | Anonymous user ID | `getAnonymousId()` in `mockData.js` | Yes | `sublingo_uid` |
+| Theme preference | `initTheme()` / `toggleTheme()` in `main.js` | Yes | `sublingo_theme` |
 | Flashcard ratings (session) | `ratings` in `flashcards.js` | No | — |
 | Test score / wrong answers (session) | `score`, `wrongAnswers` in `test.js` | No | — |
 
@@ -193,6 +196,8 @@ Defined entirely in `css/style.css`. Use only CSS custom properties — never ha
 --sl-radius, --sl-radius-sm
 --sl-shadow, --sl-shadow-md
 ```
+
+**Dark mode:** `[data-theme="dark"]` on `<html>` overrides every token. Applied before first paint via a small inline script in each page's `<head>`. Never use `prefers-color-scheme` media query in CSS — use the `data-theme` attribute so JS can override the system preference.
 
 Typography: `Fraunces` (headings/display) + `Inter` (UI/body) loaded via `@import` inside `style.css` only. Do not add separate `<link>` tags for fonts in HTML.
 
