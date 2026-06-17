@@ -10,171 +10,204 @@
 </head>
 <body>
 
-  <!-- ── Navbar ──────────────────────────────────────────────────────────── -->
-  <nav class="navbar navbar-expand-md navbar-sublingo sticky-top">
-    <div class="container">
-      <a class="navbar-brand d-flex align-items-center" href="index.html">
-        <span class="brand-logo"><i class="bi bi-translate"></i></span>
-        <span>SubLingo</span>
-      </a>
-      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="mainNav">
-        <ul class="navbar-nav ms-auto gap-1">
-          <li class="nav-item"><a class="nav-link" href="index.html"><i class="bi bi-house me-1"></i>Home</a></li>
-          <li class="nav-item"><a class="nav-link" href="words.html"><i class="bi bi-list-ul me-1"></i>Words</a></li>
-          <li class="nav-item"><a class="nav-link" href="flashcards.html"><i class="bi bi-card-text me-1"></i>Flashcards</a></li>
-          <li class="nav-item"><a class="nav-link" href="test.html"><i class="bi bi-patch-question me-1"></i>Test</a></li>
-        </ul>
-      </div>
+<!-- ── Navbar ────────────────────────────────────────────────────────────── -->
+<nav class="sl-navbar sticky-top">
+  <div class="container d-flex align-items-center justify-content-between" style="max-width:1100px;">
+    <a class="sl-brand" href="index.html">
+      <span class="sl-brand-mark"><i class="bi bi-translate"></i></span>
+      SubLingo
+    </a>
+    <button class="navbar-toggler border-0 d-md-none" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" style="background:none;">
+      <i class="bi bi-list fs-5" style="color:var(--sl-ink);"></i>
+    </button>
+    <div class="collapse navbar-collapse d-md-flex justify-content-end" id="mainNav">
+      <nav class="d-flex gap-1 mt-2 mt-md-0">
+        <a class="sl-nav-link" href="index.html"      data-page="index.html"><i class="bi bi-grid me-1"></i>Library</a>
+        <a class="sl-nav-link" href="words.html"      data-page="words.html"><i class="bi bi-list-ul me-1"></i>Words</a>
+        <a class="sl-nav-link" href="flashcards.html" data-page="flashcards.html"><i class="bi bi-card-text me-1"></i>Flashcards</a>
+        <a class="sl-nav-link" href="test.html"       data-page="test.html"><i class="bi bi-patch-question me-1"></i>Test</a>
+      </nav>
     </div>
-  </nav>
+  </div>
+</nav>
 
-  <main class="container py-4">
+<main class="container py-4" style="max-width:640px;">
 
-    <!-- ── Progress strip ───────────────────────────────────────────────── -->
+  <!-- ── No-deck empty state ───────────────────────────────────────────────── -->
+  <div id="noDeckScreen" class="sl-empty d-none">
+    <div class="sl-empty__icon"><i class="bi bi-collection"></i></div>
+    <h2 class="sl-empty__title">No deck selected</h2>
+    <p class="sl-empty__body">Go to the library, open a deck, then come back to study.</p>
+    <a href="index.html" class="btn-primary-sl">Back to Library</a>
+  </div>
+
+  <!-- ── Study screen ──────────────────────────────────────────────────────── -->
+  <div id="studyScreen">
+
+    <!-- Header: deck name + counter -->
     <div class="d-flex align-items-center justify-content-between mb-2">
-      <span class="small fw-semibold text-muted" id="cardCounter">Card 1 / 15</span>
-      <a href="words.html" class="small text-muted text-decoration-none">
-        <i class="bi bi-pencil me-1"></i>Edit deck
+      <a href="words.html" class="d-flex align-items-center gap-1"
+         style="font-size:var(--sl-text-xs);color:var(--sl-muted);text-decoration:none;">
+        <i class="bi bi-arrow-left"></i>
+        <span id="deckLabel" style="font-weight:500;color:var(--sl-ink);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+      </a>
+      <span style="font-size:var(--sl-text-xs);font-weight:600;color:var(--sl-muted);" id="cardCounter">1 / —</span>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="sl-progress mb-4">
+      <div class="sl-progress-bar" id="progressBar" style="width:0%;"></div>
+    </div>
+
+    <!-- Flashcard -->
+    <div class="flashcard-scene mb-2">
+      <div class="flashcard" id="flashcard" onclick="flipCard()" role="button" tabindex="0"
+           aria-label="Flashcard — click to flip"
+           onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();flipCard();}">
+        <!-- Front -->
+        <div class="flashcard-face flashcard-front">
+          <div class="text-center w-100">
+            <div class="d-flex align-items-center justify-content-center gap-2 mb-1">
+              <span class="flashcard-front__word" id="cardWord">—</span>
+              <button class="btn-audio" id="audioBtn" title="Pronounce" style="flex-shrink:0;">
+                <i class="bi bi-volume-up"></i>
+              </button>
+            </div>
+            <div class="flashcard-front__ipa" id="cardIpa"></div>
+            <div class="mt-2" id="cardPosLevel"></div>
+            <div class="mt-4 flip-hint">
+              <i class="bi bi-hand-index me-1"></i>Tap to reveal translation
+            </div>
+          </div>
+        </div>
+        <!-- Back -->
+        <div class="flashcard-face flashcard-back">
+          <div class="text-center w-100">
+            <div class="flashcard-back__translation" id="cardTranslation"></div>
+            <div class="flashcard-back__definition"  id="cardDefinition"></div>
+            <div class="flashcard-back__example"     id="cardExample"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="flip-hint mb-3">
+      Tap the card to flip &nbsp;·&nbsp; Rate after seeing the answer
+      &nbsp;·&nbsp; <kbd style="font-size:.7rem;padding:.1rem .35rem;border-radius:4px;border:1px solid var(--sl-line);background:var(--sl-soft);">Space</kbd> to flip
+    </p>
+
+    <!-- Rating buttons -->
+    <div class="d-flex justify-content-center gap-2 flex-wrap mb-4">
+      <button class="rating-btn rating-again" id="rateAgain">
+        <i class="bi bi-arrow-counterclockwise"></i> Again
+      </button>
+      <button class="rating-btn rating-hard" id="rateHard">
+        <i class="bi bi-emoji-neutral"></i> Hard
+      </button>
+      <button class="rating-btn rating-easy" id="rateEasy">
+        <i class="bi bi-emoji-smile"></i> Easy
+      </button>
+    </div>
+
+    <!-- Prev / Skip -->
+    <div class="d-flex justify-content-center gap-3">
+      <button class="btn-ghost-sm" id="prevBtn" onclick="goBack()" disabled>
+        <i class="bi bi-chevron-left"></i> Previous
+      </button>
+      <button class="btn-ghost-sm" onclick="advance()">
+        Skip <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+
+  </div><!-- /studyScreen -->
+
+  <!-- ── Completion screen ──────────────────────────────────────────────────── -->
+  <div id="completionScreen" class="d-none text-center py-4">
+    <div class="result-circle mb-2">
+      <i class="bi bi-trophy-fill" style="font-size:1.75rem;color:var(--sl-primary);"></i>
+    </div>
+    <h2 style="font-family:'Fraunces',Georgia,serif;font-weight:700;" class="mb-1">Deck complete!</h2>
+    <p style="font-size:var(--sl-text-sm);color:var(--sl-muted);" class="mb-1">
+      You reviewed all <strong id="summaryTotal">0</strong> words in
+      <strong id="summaryDeck"></strong>.
+    </p>
+
+    <div class="row g-3 justify-content-center mb-4 mt-2">
+      <div class="col-4">
+        <div class="sl-card p-3 text-center">
+          <div style="font-size:1.5rem;font-weight:700;color:var(--sl-success);font-family:'Fraunces',Georgia,serif;" id="summaryEasy">0</div>
+          <div style="font-size:var(--sl-text-xs);color:var(--sl-muted);">Easy</div>
+        </div>
+      </div>
+      <div class="col-4">
+        <div class="sl-card p-3 text-center">
+          <div style="font-size:1.5rem;font-weight:700;color:#92400e;font-family:'Fraunces',Georgia,serif;" id="summaryHard">0</div>
+          <div style="font-size:var(--sl-text-xs);color:var(--sl-muted);">Hard</div>
+        </div>
+      </div>
+      <div class="col-4">
+        <div class="sl-card p-3 text-center">
+          <div style="font-size:1.5rem;font-weight:700;color:var(--sl-danger);font-family:'Fraunces',Georgia,serif;" id="summaryAgain">0</div>
+          <div style="font-size:var(--sl-text-xs);color:var(--sl-muted);">Again</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="d-flex flex-wrap justify-content-center gap-2">
+      <button class="btn-ghost" onclick="restartDeck()">
+        <i class="bi bi-arrow-repeat"></i> Study again
+      </button>
+      <a href="test.html" class="btn-primary-sl">
+        <i class="bi bi-patch-question"></i> Take test
+      </a>
+      <a href="index.html" class="btn-ghost">
+        <i class="bi bi-grid"></i> Library
       </a>
     </div>
-    <div class="progress mb-4" style="height: 8px; border-radius: 99px;">
-      <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%; border-radius: 99px;" aria-valuemin="0" aria-valuemax="100"></div>
-    </div>
+  </div>
 
-    <!-- ── Study screen ──────────────────────────────────────────────────── -->
-    <div id="studyScreen">
+</main>
 
-      <!-- Flashcard -->
-      <div class="flashcard-scene mb-2" style="min-height: 300px;">
-        <div class="flashcard" id="flashcard" onclick="flipCard()" role="button" aria-label="Flip card">
-          <!-- Front -->
-          <div class="flashcard-face flashcard-front">
-            <div class="text-center w-100">
-              <div class="d-flex align-items-center justify-content-center gap-2 mb-1">
-                <div class="card-word" id="cardWord">reluctant</div>
-                <button class="btn-audio" onclick="event.stopPropagation(); playWordAudio(document.getElementById('cardWord').textContent)" title="Pronounce">
-                  <i class="bi bi-volume-up"></i>
-                </button>
-              </div>
-              <div class="card-ipa" id="cardIpa">/rɪˈlʌktənt/</div>
-              <div class="mt-2" id="cardPosLevel"></div>
-              <div class="mt-4 text-muted small">
-                <i class="bi bi-hand-index me-1"></i>Tap to see translation
-              </div>
-            </div>
-          </div>
-          <!-- Back -->
-          <div class="flashcard-face flashcard-back">
-            <div class="text-center w-100">
-              <div class="card-translation" id="cardTranslation">istamasdan, ikkilanuvchi</div>
-              <div class="card-definition" id="cardDefinition">Unwilling and hesitant; not eager to do something.</div>
-              <div class="card-example" id="cardExample">"She was reluctant to leave the party early."</div>
-            </div>
-          </div>
-        </div>
-      </div>
+<!-- ── Footer ────────────────────────────────────────────────────────────── -->
+<footer>
+  <div style="max-width:1100px;margin:0 auto;padding:0 1.25rem;">
+    <strong style="font-family:'Fraunces',Georgia,serif;">SubLingo</strong>
+    &nbsp;·&nbsp; English–Uzbek vocabulary builder
+  </div>
+</footer>
 
-      <p class="flip-hint mb-3">
-        <i class="bi bi-arrow-repeat me-1"></i>Tap the card to flip &nbsp;|&nbsp; Rate yourself after seeing the answer
-      </p>
+<div id="toast-container"></div>
 
-      <!-- Rating buttons (shown after flip) -->
-      <div class="d-flex justify-content-center gap-2 flex-wrap mb-4">
-        <button class="btn btn-again px-4 py-2" onclick="rateCard('again')" title="I didn't remember this">
-          <i class="bi bi-arrow-counterclockwise me-1"></i>Again
-        </button>
-        <button class="btn btn-hard px-4 py-2" onclick="rateCard('hard')" title="I remembered with difficulty">
-          <i class="bi bi-emoji-neutral me-1"></i>Hard
-        </button>
-        <button class="btn btn-easy px-4 py-2" onclick="rateCard('easy')" title="I remembered easily">
-          <i class="bi bi-emoji-smile me-1"></i>Easy
-        </button>
-      </div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/mockData.js"></script>
+<script src="js/main.js"></script>
+<script src="js/flashcards.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    initDeck();
 
-      <!-- Prev / Next navigation -->
-      <div class="d-flex justify-content-center gap-3">
-        <button class="btn btn-outline-secondary px-3" id="prevBtn" onclick="goBack()" disabled>
-          <i class="bi bi-chevron-left me-1"></i>Previous
-        </button>
-        <button class="btn btn-outline-sl px-3" onclick="advance()">
-          Skip <i class="bi bi-chevron-right ms-1"></i>
-        </button>
-      </div>
-
-    </div><!-- /studyScreen -->
-
-    <!-- ── Completion screen ─────────────────────────────────────────────── -->
-    <div id="completionScreen" class="d-none text-center py-4">
-      <div class="result-circle mb-3">
-        <i class="bi bi-trophy-fill fs-1" style="color: var(--sl-primary);"></i>
-      </div>
-      <h2 class="fw-bold mb-1">Deck complete!</h2>
-      <p class="text-muted mb-4">You reviewed all <strong id="summaryTotal">0</strong> words.</p>
-
-      <div class="row g-3 justify-content-center mb-4">
-        <div class="col-4 col-sm-3">
-          <div class="sl-card p-3 text-center">
-            <div class="fs-3 fw-bold" style="color: #16a34a;"><span id="summaryEasy">0</span></div>
-            <div class="small text-muted">Easy</div>
-          </div>
-        </div>
-        <div class="col-4 col-sm-3">
-          <div class="sl-card p-3 text-center">
-            <div class="fs-3 fw-bold" style="color: #d97706;"><span id="summaryHard">0</span></div>
-            <div class="small text-muted">Hard</div>
-          </div>
-        </div>
-        <div class="col-4 col-sm-3">
-          <div class="sl-card p-3 text-center">
-            <div class="fs-3 fw-bold" style="color: #dc2626;"><span id="summaryAgain">0</span></div>
-            <div class="small text-muted">Again</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="d-flex flex-wrap justify-content-center gap-3">
-        <button class="btn btn-outline-sl px-4 py-2 fw-semibold" onclick="restartDeck()">
-          <i class="bi bi-arrow-repeat me-2"></i>Study Again
-        </button>
-        <a href="test.html" class="btn btn-primary px-4 py-2 fw-semibold">
-          <i class="bi bi-patch-question me-2"></i>Take Test
-        </a>
-        <a href="index.html" class="btn btn-outline-secondary px-4 py-2">
-          <i class="bi bi-house me-2"></i>Home
-        </a>
-      </div>
-    </div><!-- /completionScreen -->
-
-  </main>
-
-  <!-- ── Footer ──────────────────────────────────────────────────────────── -->
-  <footer>
-    <strong>SubLingo</strong> &nbsp;·&nbsp; English–Uzbek vocabulary builder
-  </footer>
-
-  <div id="toast-container"></div>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="js/mockData.js"></script>
-  <script src="js/main.js"></script>
-  <script src="js/flashcards.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      initDeck();
-
-      // Keyboard shortcuts
-      document.addEventListener('keydown', e => {
-        if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); flipCard(); }
-        if (e.key === 'ArrowRight') advance();
-        if (e.key === 'ArrowLeft')  goBack();
-        if (e.key === '1') rateCard('again');
-        if (e.key === '2') rateCard('hard');
-        if (e.key === '3') rateCard('easy');
-      });
+    // Audio button uses addEventListener (no onclick + string in attribute)
+    document.getElementById('audioBtn').addEventListener('click', e => {
+      e.stopPropagation();
+      playWordAudio(document.getElementById('cardWord').textContent);
     });
-  </script>
+
+    // Rating buttons
+    document.getElementById('rateAgain').addEventListener('click', () => rateCard('again'));
+    document.getElementById('rateHard').addEventListener('click',  () => rateCard('hard'));
+    document.getElementById('rateEasy').addEventListener('click',  () => rateCard('easy'));
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', e => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); flipCard(); }
+      if (e.key === 'ArrowRight') advance();
+      if (e.key === 'ArrowLeft')  goBack();
+      if (e.key === '1') rateCard('again');
+      if (e.key === '2') rateCard('hard');
+      if (e.key === '3') rateCard('easy');
+    });
+  });
+</script>
 </body>
 </html>

@@ -1,57 +1,58 @@
-// flashcards.js — Flashcard study logic
+// flashcards.js — Deck-scoped flashcard logic
 
-// TODO: replace getSelectedWords() with words fetched from a real backend session
-let deck = [];
+// TODO: replace getActiveDeck() with a fetch from /api/session/words for the real backend session
+let deck        = null;
 let currentIndex = 0;
-let ratings = {}; // { wordId: 'again' | 'hard' | 'easy' }
+let ratings     = {};   // { wordId: 'again' | 'hard' | 'easy' }
 
 function initDeck() {
-  deck = getSelectedWords();
-  if (deck.length === 0) {
-    // Fallback: use all words if nothing is selected
-    deck = [...MOCK_WORDS];
+  deck = getActiveDeck();
+
+  if (!deck || deck.words.length === 0) {
+    showNoDeck();
+    return;
   }
+
   currentIndex = 0;
+  ratings      = {};
   renderCard();
 }
 
-function renderCard() {
-  const completionScreen = document.getElementById('completionScreen');
-  const studyScreen      = document.getElementById('studyScreen');
+function showNoDeck() {
+  document.getElementById('studyScreen').classList.add('d-none');
+  document.getElementById('completionScreen').classList.add('d-none');
+  document.getElementById('noDeckScreen').classList.remove('d-none');
+}
 
-  if (currentIndex >= deck.length) {
+function renderCard() {
+  if (currentIndex >= deck.words.length) {
     showCompletion();
     return;
   }
 
-  completionScreen.classList.add('d-none');
-  studyScreen.classList.remove('d-none');
+  document.getElementById('completionScreen').classList.add('d-none');
+  document.getElementById('noDeckScreen').classList.add('d-none');
+  document.getElementById('studyScreen').classList.remove('d-none');
 
-  const word = deck[currentIndex];
-  const card = document.getElementById('flashcard');
+  const word = deck.words[currentIndex];
 
-  // Reset flip state
-  card.classList.remove('flipped');
+  document.getElementById('flashcard').classList.remove('flipped');
 
-  // Front face
-  document.getElementById('cardWord').textContent       = word.word;
-  document.getElementById('cardIpa').textContent        = word.ipa;
-  document.getElementById('cardPosLevel').innerHTML     =
-    `<span class="badge ${posBadgeClass(word.partOfSpeech)} rounded-pill me-1">${word.partOfSpeech}</span>
-     <span class="badge ${levelBadgeClass(word.level)} rounded-pill">${word.level}</span>`;
+  document.getElementById('cardWord').textContent        = word.word;
+  document.getElementById('cardIpa').textContent         = word.ipa;
+  document.getElementById('cardPosLevel').innerHTML      =
+    `<span class="${posBadgeClass(word.partOfSpeech)}">${word.partOfSpeech}</span>
+     <span class="${levelBadgeClass(word.level)} ms-1">${word.level}</span>`;
 
-  // Back face
   document.getElementById('cardTranslation').textContent = word.translation;
   document.getElementById('cardDefinition').textContent  = word.definition;
   document.getElementById('cardExample').textContent     = `"${word.example}"`;
 
-  // Progress
-  const progress = Math.round((currentIndex / deck.length) * 100);
-  document.getElementById('progressBar').style.width    = progress + '%';
-  document.getElementById('progressBar').setAttribute('aria-valuenow', progress);
-  document.getElementById('cardCounter').textContent    = `Card ${currentIndex + 1} / ${deck.length}`;
+  const pct = Math.round(currentIndex / deck.words.length * 100);
+  document.getElementById('progressBar').style.width    = pct + '%';
+  document.getElementById('cardCounter').textContent    = `${currentIndex + 1} / ${deck.words.length}`;
+  document.getElementById('deckLabel').textContent      = deck.name;
 
-  // Nav buttons
   document.getElementById('prevBtn').disabled = currentIndex === 0;
 }
 
@@ -60,15 +61,16 @@ function flipCard() {
 }
 
 function rateCard(rating) {
-  const word = deck[currentIndex];
+  const word = deck.words[currentIndex];
   ratings[word.id] = rating;
 
-  // TODO: send rating to spaced-repetition backend (e.g. SM-2 algorithm)
-  console.log(`[SRS stub] Word "${word.word}" rated: ${rating}`);
+  // TODO: POST to /api/srs/rate with { wordId, userId, rating, timestamp } for FSRS scheduling
+  console.log(`[SRS stub] "${word.word}" rated: ${rating}`);
 
   if (rating === 'easy') {
-    // TODO: mark word as learned in backend
-    word.learned = true;
+    // TODO: also POST to /api/words/:id/learned
+    markWordLearned(deck.id, word.id, true);
+    deck = getActiveDeck(); // refresh after mutation
   }
 
   advance();
@@ -80,29 +82,26 @@ function advance() {
 }
 
 function goBack() {
-  if (currentIndex > 0) {
-    currentIndex--;
-    renderCard();
-  }
+  if (currentIndex > 0) { currentIndex--; renderCard(); }
 }
 
 function showCompletion() {
   document.getElementById('studyScreen').classList.add('d-none');
   document.getElementById('completionScreen').classList.remove('d-none');
 
-  const total   = deck.length;
-  const easy    = Object.values(ratings).filter(r => r === 'easy').length;
-  const hard    = Object.values(ratings).filter(r => r === 'hard').length;
-  const again   = Object.values(ratings).filter(r => r === 'again').length;
+  const total = deck.words.length;
+  const easy  = Object.values(ratings).filter(r => r === 'easy').length;
+  const hard  = Object.values(ratings).filter(r => r === 'hard').length;
+  const again = Object.values(ratings).filter(r => r === 'again').length;
 
+  document.getElementById('summaryDeck').textContent  = deck.name;
   document.getElementById('summaryTotal').textContent = total;
   document.getElementById('summaryEasy').textContent  = easy;
   document.getElementById('summaryHard').textContent  = hard;
   document.getElementById('summaryAgain').textContent = again;
 
-  // Progress bar at 100%
-  document.getElementById('progressBar').style.width = '100%';
-  document.getElementById('cardCounter').textContent = `${total} / ${total} — Complete!`;
+  document.getElementById('progressBar').style.width  = '100%';
+  document.getElementById('cardCounter').textContent  = `${total} / ${total}`;
 }
 
 function restartDeck() {

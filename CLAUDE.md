@@ -6,9 +6,11 @@ This file is the authoritative guide for any AI agent (Claude or otherwise) work
 
 ## What this project is
 
-SubLingo is a static, front-end-only web app that helps Uzbek-speaking users learn English vocabulary from video subtitles. The current state is an **MVP UI shell**: all data is mocked, there is no backend, and every real integration point is marked with a `// TODO:` comment.
+SubLingo is a static, front-end-only web app that helps Uzbek-speaking users learn English vocabulary from video subtitles. Users create named **decks** from subtitle files; each deck is a self-contained study group. They study decks via flip-card review and multiple-choice tests.
 
-Language pair: **English → Uzbek**. The UI language is English. All user-facing strings are written inline for now — they should eventually be extracted into a single localization object so the UI can be switched to Uzbek.
+Current state: **MVP v0.2 UI shell** — all data is mocked, there is no backend, and every real integration point is marked with a `// TODO:` comment.
+
+Language pair: **English → Uzbek**. The UI language is English. All user-facing strings are written inline for now — they should eventually be extracted into a single `i18n.js` localization object so the UI can be switched to Uzbek.
 
 ---
 
@@ -16,101 +18,169 @@ Language pair: **English → Uzbek**. The UI language is English. All user-facin
 
 ```
 sublingo/
-├── index.html          Home / Upload screen
-├── words.html          Extracted words list + deck selection
-├── flashcards.html     Flip-card study screen
-├── test.html           Multiple-choice quiz screen
+├── index.html          Library (deck grid) + hero + new-deck modal
+├── words.html          Deck detail: word list + filters + inline rename
+├── flashcards.html     Flip-card study screen (deck-scoped)
+├── test.html           Multiple-choice quiz screen (deck-scoped)
 ├── css/
-│   └── style.css       All custom styles (on top of Bootstrap 5)
+│   └── style.css       Full design system: tokens, components, layout
 └── js/
-    ├── mockData.js     Word data array + selection state helpers
-    ├── main.js         Shared utilities: nav, badges, TTS stub, toasts
-    ├── flashcards.js   Deck and card logic
-    └── test.js         Quiz question building and answer checking
+    ├── mockData.js     Deck model, seed data, persistence, all helpers
+    ├── main.js         Shared utilities: nav, badges, ring SVG, TTS stub, toasts, confirm dialog
+    ├── flashcards.js   Deck-scoped flashcard logic
+    └── test.js         Deck-scoped quiz logic
 ```
 
-Every HTML page loads scripts in this exact order: `mockData.js` → `main.js` → page-specific JS. Do not reorder these; `mockData.js` must run first because the others depend on `MOCK_WORDS` and `selectedWordIds`.
+Every HTML page loads scripts in this exact order: `mockData.js` → `main.js` → page-specific JS. Do not reorder; `mockData.js` must run first because all other scripts depend on `DECKS`, `activeDeckId`, and the helper functions it exports.
 
 ---
 
-## Core data shape
+## Core data shapes
 
-Every word object in `MOCK_WORDS` (and in any future API response) must conform to this shape:
-
+### Deck object
 ```js
 {
-  id:           Number,   // unique, stable integer
+  id:        String,    // unique — created via `deck_${Date.now()}_${randomSuffix}`
+  name:      String,    // user-given name
+  source:    String,    // original filename or "Pasted text"
+  createdAt: Number,    // Date.now()
+  words:     Word[],    // array of Word objects (schema below)
+  stats:     { total: Number, learned: Number }  // always kept in sync via recomputeStats()
+}
+```
+
+### Word object
+```js
+{
+  id:           Number,   // unique integer within the deck
   word:         String,   // English headword
   partOfSpeech: String,   // e.g. "adjective", "verb", "noun", "adjective / verb"
-  translation:  String,   // Uzbek; may contain apostrophes (ʻ or ')
+  translation:  String,   // Uzbek — may contain apostrophes (ʻ or ')
   definition:   String,   // English definition
-  ipa:          String,   // IPA transcription including slashes, e.g. "/rɪˈlʌktənt/"
-  example:      String,   // Example sentence (from subtitle context when real)
+  ipa:          String,   // IPA transcription incl. slashes, e.g. "/rɪˈlʌktənt/"
+  example:      String,   // Example sentence (subtitle context when real)
   level:        String,   // CEFR: "A1" | "A2" | "B1" | "B2" | "C1" | "C2"
   learned:      Boolean   // study-progress flag
 }
 ```
 
-**Never** embed word translations directly in HTML `onclick` attribute strings — Uzbek text contains apostrophes that break inline JS. Always use index-based references (see `test.js → renderQuestion`).
+**Never** embed word translations directly in HTML `onclick` attribute strings — Uzbek text contains apostrophes that break inline JS. Always use index/id-based references and `addEventListener` (see `test.js → renderQuestion`, `words.html → renderWords`).
 
 ---
 
 ## State management
 
-There is no framework. State lives in three places:
+| State | Location | Persisted? | localStorage key |
+|---|---|---|---|
+| All decks | `DECKS` array in `mockData.js` | Yes | `sublingo_decks` |
+| Active deck ID | `activeDeckId` in `mockData.js` | Yes | `sublingo_active_deck` |
+| Flashcard ratings (session) | `ratings` object in `flashcards.js` | No | — |
+| Test score / wrong answers (session) | `score`, `wrongAnswers` in `test.js` | No | — |
+| Anonymous user ID | `getAnonymousId()` in `main.js` | Yes | `sublingo_uid` |
 
-| State | Location | Persisted? |
-|---|---|---|
-| Word pool | `MOCK_WORDS` (global const) | No (page reload resets) |
-| Selected word IDs | `selectedWordIds` (global `let` in `mockData.js`) | Yes — `localStorage` key `sublingo_selected` |
-| Flashcard progress (ratings) | `ratings` object in `flashcards.js` | No |
-| Test score / wrong answers | `score`, `wrongAnswers` in `test.js` | No |
+`loadDecksFromStorage()` runs automatically at the bottom of `mockData.js`. If `sublingo_decks` is empty or absent it falls back to the two seed decks defined in the same file.
 
-`loadSelectionFromStorage()` runs automatically at the bottom of `mockData.js`, so selection persists across page navigations.
+The old `selectedWordIds` / `sublingo_selected` state is retired. Selection is now "which deck is active," managed entirely through `activeDeckId` / `setActiveDeck(id)`.
+
+---
+
+## Deck helpers (all in `mockData.js`)
+
+| Function | What it does |
+|---|---|
+| `getDecks()` | Returns the `DECKS` array |
+| `getDeckById(id)` | Returns one deck or `null` |
+| `getActiveDeck()` | Returns the active deck (falls back to first deck) |
+| `setActiveDeck(id)` | Sets `activeDeckId` and persists it |
+| `createDeck(name, source, words)` | Creates, pushes, and persists a new deck; returns it |
+| `renameDeck(id, name)` | Mutates deck name and persists |
+| `deleteDeck(id)` | Removes deck, resets active if needed, persists |
+| `markWordLearned(deckId, wordId, learned)` | Mutates word flag, calls `recomputeStats`, persists |
+| `recomputeStats(deck)` | Recalculates `deck.stats` from `deck.words` |
+| `saveDecksToStorage()` | Writes `DECKS` to localStorage |
+| `loadDecksFromStorage()` | Reads from localStorage; seeds if empty |
+| `timeAgo(timestamp)` | Returns a human-readable relative time string |
 
 ---
 
 ## TODO integration points
 
-These are the exact locations where real backend / AI logic must be wired in. Touch each file at the comment shown.
+### `js/mockData.js` — `createDeck()`
+Replace mock `words` argument with data from `POST /api/extract` (subtitle parser agent). The caller in `index.html → handleCreateDeck()` should:
+1. Read the file via `FileReader` API (`file.text()`).
+2. POST the content to `/api/extract` with `{ content, targetLevel, maxWords, langPair }`.
+3. Receive `{ words: Word[] }` and pass `words` to `createDeck()`.
 
-### `js/mockData.js` — top of file
-Replace `MOCK_WORDS` array with an API call to the subtitle parser + vocabulary extractor. Shape must match the schema above.
+### `js/mockData.js` — `getActiveDeck()`
+The real version should fetch from `GET /api/session/words?deckId=…` to hydrate the deck with fresh server-side data (e.g. updated SRS intervals, server-side learned flags).
 
-### `index.html` — `handleExtract()` function
-Currently just navigates to `words.html`. Replace with:
-1. Read the uploaded file via `FileReader` API.
-2. POST raw subtitle text to `/api/extract` (subtitle parser).
-3. Receive `Word[]` array; write it into `MOCK_WORDS` (or a session-scoped replacement).
-4. Navigate to `words.html`.
+### `index.html` — `showFileSelected()`
+Wire real file reading: `const text = await pickedFile.text()` then pass to the extract API.
 
-### `index.html` — `showFileSelected()` function
-Currently only shows the filename. Wire real file reading here.
+### `index.html` — `handleCreateDeck()`
+Replace mock seed-word slice with real API call (see `createDeck()` note above).
 
-### `js/main.js` — `playWordAudio()`
-Currently uses Web Speech API as a stub. Replace with a call to a real TTS endpoint (e.g. ElevenLabs, Google TTS, or Anthropic's future audio API) that streams an MP3 for the given English word.
+### `js/main.js` — `playWordAudio(word)`
+Replace Web Speech API stub with a real TTS endpoint (ElevenLabs, Google TTS, etc.):
+```js
+const audio = new Audio(`/api/tts?word=${encodeURIComponent(word)}&lang=en-US`);
+audio.play();
+```
 
 ### `js/flashcards.js` — `rateCard()`
-The `console.log` stub should become a POST to `/api/srs/rate` with `{ wordId, rating, timestamp }`. Implement SM-2 or FSRS on the backend and return the next review interval.
+Replace `console.log` stub with:
+```js
+fetch('/api/srs/rate', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ wordId: word.id, userId: getAnonymousId(), rating, timestamp: new Date().toISOString() })
+});
+```
 
-### `js/flashcards.js` — `rateCard()` easy branch
-`word.learned = true` should also POST to `/api/words/:id/learned`.
+### `js/flashcards.js` — easy branch in `rateCard()`
+`markWordLearned(deck.id, word.id, true)` already persists locally. Also POST to `/api/words/:id/learned` for server-side tracking.
 
 ### `js/test.js` — `checkAnswer()` correct/wrong branches
-Both `console.log` stubs should POST to `/api/test/answer` with `{ wordId, correct, timestamp }` for analytics and adaptive scheduling.
+Both `console.log` stubs should POST to `/api/test/answer`:
+```js
+fetch('/api/test/answer', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ wordId: word.id, userId: getAnonymousId(), correct: isCorrect, timestamp: new Date().toISOString() })
+});
+```
 
-### `js/mockData.js` — `getSelectedWords()`
-Replace with a fetch from `/api/session/words` that returns the user's current deck for the active session.
+---
+
+## Design system
+
+Defined entirely in `css/style.css`. Use only these variables — never hardcode hex values inline.
+
+```css
+--sl-bg, --sl-surface, --sl-ink, --sl-muted, --sl-line, --sl-soft
+--sl-primary, --sl-primary-600, --sl-primary-bg
+--sl-accent, --sl-accent-bg
+--sl-success, --sl-danger, --sl-danger-bg
+--sl-radius, --sl-radius-sm
+--sl-shadow, --sl-shadow-md
+```
+
+Typography: `Fraunces` (headings, display, card word titles) loaded via `@import` in `style.css`. `Inter` for all UI/body text. Do not add a separate `<link>` for fonts in HTML — the CSS import handles it.
+
+Accent color (`--sl-accent`: terracotta `#E2703A`) is used **sparingly** — one key action or highlight per screen only. Do not use it for generic badges or borders.
 
 ---
 
 ## Conventions to keep
 
-- **No framework, no build step.** Keep all JS as vanilla ES2020 or earlier. If you need a utility, write it inline; do not introduce npm.
-- **Bootstrap 5 utility classes first.** Only add custom CSS to `style.css` when Bootstrap utilities cannot do the job.
-- **CSS variables for color.** Never hardcode the accent color inline — always use `var(--sl-primary)` etc. (defined at the top of `style.css`).
-- **Mobile-first.** Any new layout must work at 375 px viewport width before you test at desktop sizes.
-- **No comments explaining what code does.** Comments exist only for TODOs and non-obvious WHYs.
+- **No framework, no build step.** Vanilla ES2020 only. No npm.
+- **Bootstrap 5 utility classes first.** Custom CSS in `style.css` only when Bootstrap can't do it.
+- **All color via CSS variables.** Never hardcode hex inline in HTML or JS.
+- **Mobile-first.** Verify at 375px before desktop.
+- **No comments explaining WHAT code does.** Only TODOs and non-obvious WHYs.
+- **No Uzbek text in `onclick` attributes.** Always use `addEventListener` + index/id references.
+- **Script load order:** `mockData.js` → `main.js` → page-specific JS. Enforced in every HTML file.
+- **`recomputeStats(deck)` + `saveDecksToStorage()` after any mutation** that changes a word's `learned` flag.
 
 ---
 
@@ -121,7 +191,8 @@ Do not add any of the following unless explicitly asked:
 - Real subtitle parsing or NLP.
 - A backend server or database.
 - User authentication.
-- A spaced-repetition algorithm (just keep the Again/Hard/Easy stub).
-- Real audio file generation or playback beyond the Web Speech API stub.
+- A spaced-repetition algorithm (keep the Again/Hard/Easy stub).
+- Real audio file generation beyond the Web Speech API stub.
 - Any npm package or build toolchain.
-- Additional languages beyond English → Uzbek.
+- Additional language pairs beyond English → Uzbek.
+- A settings / preferences screen.
