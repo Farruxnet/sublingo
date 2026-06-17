@@ -41,6 +41,8 @@ The `.study-tabs` bar inside study pages has a "← Deck" link back to `deck.htm
 
 **v0.6 changes:** Telegram Mini App script in every page `<head>`; `initTelegram()` IIFE in `main.js`; crash-fixed `#noDeckScreen` null refs in `flashcards.js` and `test.js`; `requireAuth()` moved before `library.js` loads; sun/moon SVG swap on theme toggle (`_updateThemeIcon()`); learned-word toggle button added to every word card in `words.html` (`toggleLearned()`); Bootstrap navbar collapse fixed (removed conflicting `d-md-flex`); "Library" → "My Library" across all logged-in pages; safe-area insets on `<body>` for Telegram/iOS; mobile tap-target enlargements.
 
+**v0.7 changes:** Navbar hamburger toggler and `.navbar-collapse` block removed from all five logged-in pages (`library.html`, `deck.html`, `words.html`, `flashcards.html`, `test.html`). The global navbar now contains only brand/logo (`href="library.html"` on all logged-in pages), theme toggle (`.btn-theme`), user chip (`.nav-user-chip`), and logout button (`.nav-logout-btn`) — all always-visible inline, no collapse. The "My Library" nav link that lived inside the collapse is gone; back-navigation on study pages is handled entirely by `.study-tabs` and the breadcrumb links already present on each page.
+
 Every HTML page loads scripts in this exact order: `telegram-web-app.js` (CDN) → `mockData.js` → `main.js` → page-specific JS. Telegram script must precede mockData so `window.Telegram` is defined when `initTelegram()` runs. Do not reorder the rest; `mockData.js` must load before `main.js` and page JS.
 
 ---
