@@ -8,7 +8,7 @@ This file is the authoritative guide for any AI agent (Claude or otherwise) work
 
 SubLingo is a static, front-end-only web app that helps Uzbek-speaking users learn English vocabulary from video subtitles. Users create named **decks** from subtitle files; each deck is a self-contained study group. They study decks via flip-card review and multiple-choice tests.
 
-Current state: **MVP v0.7 UI shell** — all data is mocked, there is no real backend, and every real integration point is marked with a `// TODO:` comment. Auth is also mocked (localStorage flag). v0.7 removes the navbar hamburger/collapse from all logged-in pages; the navbar now contains only brand, theme toggle, user chip, and logout — always visible inline.
+Current state: **MVP v0.8 UI shell** — all data is mocked, there is no real backend, and every real integration point is marked with a `// TODO:` comment. Auth is also mocked (localStorage flag). v0.8 removes `.study-tabs` from study pages; back navigation is a single `← My Library` link (`.sl-back-link`) above each study page's content.
 
 Language pair: **English → Uzbek**. The UI language is English. All user-facing strings are written inline — they should eventually be extracted into a single `i18n.js` localization object.
 
@@ -35,11 +35,13 @@ sublingo/
 ```
 
 Navigation flow: `index.html` → (login) → `library.html` → (openDeck) → `deck.html` → Words / Flashcards / Test.
-The `.study-tabs` bar inside study pages has a "← Deck" link back to `deck.html`.
+Study pages (`words.html`, `flashcards.html`, `test.html`) each have a `.sl-back-link` anchor (`← My Library` → `library.html`) above the page content.
 
 **Removed in v0.5 cleanup:** `.sl-hero*`, `.sl-word-chips`, `.sl-chip`, `.underline-accent`, `.sl-section-label` CSS rules (no HTML referenced them). Inline `<style>` block from `test.html` (moved `.feedback-correct/.feedback-wrong` to `style.css`). Per-deck nav links (Words/Flashcards/Test) removed from the global navbar — those live in `.study-tabs` and `deck.html` hub tiles only.
 
-**v0.7 changes:** Navbar hamburger toggler and `.navbar-collapse` block removed from all five logged-in pages (`library.html`, `deck.html`, `words.html`, `flashcards.html`, `test.html`). Nothing meaningful was in the collapse (only the "My Library" link which duplicates the brand), so it is gone entirely. The navbar now contains brand/logo + theme toggle + user chip + logout — all always-visible inline. Back navigation on study pages remains the `.study-tabs` `← Deck` link.
+**v0.8 changes:** `.study-tabs` block removed from `words.html`, `flashcards.html`, `test.html`. Replaced with a single `.sl-back-link` anchor (`← My Library` → `library.html`). `.study-tabs` CSS kept in `style.css`. `.sl-back-link` CSS added to `style.css` (muted color, primary on hover, no background/border).
+
+**v0.7 changes:** Navbar hamburger toggler and `.navbar-collapse` block removed from all five logged-in pages (`library.html`, `deck.html`, `words.html`, `flashcards.html`, `test.html`). Nothing meaningful was in the collapse (only the "My Library" link which duplicates the brand), so it is gone entirely. The navbar now contains brand/logo + theme toggle + user chip + logout — all always-visible inline.
 
 **v0.6 changes:** Telegram Mini App script in every page `<head>`; `initTelegram()` IIFE in `main.js`; crash-fixed `#noDeckScreen` null refs in `flashcards.js` and `test.js`; `requireAuth()` moved before `library.js` loads; sun/moon SVG swap on theme toggle (`_updateThemeIcon()`); learned-word toggle button added to every word card in `words.html` (`toggleLearned()`); Bootstrap navbar collapse fixed (removed conflicting `d-md-flex`); "Library" → "My Library" across all logged-in pages; safe-area insets on `<body>` for Telegram/iOS; mobile tap-target enlargements.
 
@@ -214,7 +216,8 @@ Accent (`--sl-accent`: terracotta `#E2703A`) is used sparingly — one key call-
 |---|---|
 | `.landing-hero` | `index.html` hero section (logged-out) |
 | `.login-card` | Login/email form card on `index.html` |
-| `.study-tabs` | Tab bar (Words / Flashcards / Test) on study pages; scrolls horizontally on mobile |
+| `.study-tabs` | Tab bar CSS kept in `style.css`; no longer used in HTML (removed v0.8) |
+| `.sl-back-link` | "← My Library" back link on study pages (`words`, `flashcards`, `test`) |
 | `.skeleton-card` + `.skel` | Loading placeholders (shimmer animation) |
 | `.nav-user-chip` | Logged-in navbar: shows email prefix |
 | `.nav-logout-btn` | Logout icon button in navbar |
