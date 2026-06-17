@@ -30,7 +30,6 @@ function renderCard() {
   }
 
   document.getElementById('completionScreen').classList.add('d-none');
-  document.getElementById('noDeckScreen').classList.add('d-none');
   document.getElementById('studyScreen').classList.remove('d-none');
 
   const word = deck.words[currentIndex];

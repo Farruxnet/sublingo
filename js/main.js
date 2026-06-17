@@ -1,12 +1,32 @@
 // main.js — Shared utilities. Depends on mockData.js already loaded.
 
+// ─── Telegram Mini App ────────────────────────────────────────────────────────
+// TODO: replace loginWithProvider('telegram') mock with real Telegram.WebApp.initDataUnsafe
+//       user object → POST /api/auth/telegram { initData: Telegram.WebApp.initData }
+(function initTelegram() {
+  const twa = window.Telegram?.WebApp;
+  if (!twa) return;
+  twa.ready();
+  twa.expand();
+  // Sync theme: Telegram colorScheme overrides saved preference (user can still toggle)
+  const savedTheme = localStorage.getItem('sublingo_theme');
+  if (!savedTheme) {
+    const tgDark = twa.colorScheme === 'dark';
+    document.documentElement.setAttribute('data-theme', tgDark ? 'dark' : 'light');
+  }
+  // Safe area inset: Telegram may set --tg-safe-area-inset-top/bottom
+  // We use env(safe-area-inset-*) in CSS which handles both native and TG
+})();
+
 // ─── Theme ────────────────────────────────────────────────────────────────────
-// initTheme() is called inline (before first paint) via a <script> in each page's <head>.
-function initTheme() {
-  const saved = localStorage.getItem('sublingo_theme');
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  const dark = saved ? saved === 'dark' : prefersDark;
-  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+function _updateThemeIcon() {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.querySelectorAll('.btn-theme').forEach(btn => {
+    btn.innerHTML = isDark
+      ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>'
+      : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+    btn.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+  });
 }
 
 function toggleTheme() {
@@ -14,9 +34,7 @@ function toggleTheme() {
   const next = isDark ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', next);
   localStorage.setItem('sublingo_theme', next);
-  // Update toggle icon if present
-  const btn = document.getElementById('themeToggle');
-  if (btn) btn.setAttribute('aria-label', next === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+  _updateThemeIcon();
 }
 
 // ─── Navigation ───────────────────────────────────────────────────────────────
@@ -40,13 +58,11 @@ document.addEventListener('DOMContentLoaded', () => {
     userChip.textContent = email === 'Guest' ? 'Guest' : email.split('@')[0];
   }
 
-  // Wire theme toggle
-  const themeBtn = document.getElementById('themeToggle');
-  if (themeBtn) {
-    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    themeBtn.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
-    themeBtn.addEventListener('click', toggleTheme);
-  }
+  // Wire all theme toggles on the page and set correct icon
+  _updateThemeIcon();
+  document.querySelectorAll('.btn-theme').forEach(btn => {
+    btn.addEventListener('click', toggleTheme);
+  });
 });
 
 // ─── CEFR badge class ─────────────────────────────────────────────────────────

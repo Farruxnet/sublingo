@@ -50,7 +50,6 @@ function initTest() {
   wrongAnswers = [];
   answered     = false;
 
-  document.getElementById('noDeckScreen').classList.add('d-none');
   renderQuestion();
 }
 
@@ -147,19 +146,9 @@ function showResults() {
   document.getElementById('resultDeck').textContent  = deck.name;
 
   const circle = document.getElementById('scoreCircle');
-  if (pct >= 80) {
-    circle.style.background   = '#dcfce7';
-    circle.style.borderColor  = 'var(--sl-success)';
-    document.getElementById('finalScore').style.color = 'var(--sl-success)';
-  } else if (pct >= 50) {
-    circle.style.background   = '#fef3c7';
-    circle.style.borderColor  = '#d97706';
-    document.getElementById('finalScore').style.color = '#92400e';
-  } else {
-    circle.style.background   = 'var(--sl-danger-bg)';
-    circle.style.borderColor  = 'var(--sl-danger)';
-    document.getElementById('finalScore').style.color = 'var(--sl-danger)';
-  }
+  const scoreEl = document.getElementById('finalScore');
+  circle.className = 'result-circle mb-4 ' + (pct >= 80 ? 'result-circle--good' : pct >= 50 ? 'result-circle--ok' : 'result-circle--bad');
+  scoreEl.className = 'score-num ' + (pct >= 80 ? 'result-circle--good' : pct >= 50 ? 'result-circle--ok' : 'result-circle--bad');
 
   document.getElementById('resultMessage').textContent =
     pct >= 80 ? 'Excellent work!' : pct >= 50 ? 'Good job — keep going!' : 'Keep practicing!';

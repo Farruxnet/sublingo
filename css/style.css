@@ -1,4 +1,5 @@
 /* style.css — SubLingo design system */
+/* Safe-area insets for Telegram Mini App (also covers iOS notch/home indicator) */
 
 /* ─── Google Fonts ───────────────────────────────────────────────────────────
    Loaded here as @import so this single file is the only include needed.
@@ -100,6 +101,8 @@ a { color: var(--sl-primary); text-decoration: none; }
 a:hover { color: var(--sl-primary-600); }
 
 /* ─── Navbar ─────────────────────────────────────────────────────────────────*/
+/* Bootstrap collapse + flex: on mobile the expanded menu stacks vertically */
+.sl-navbar .navbar-collapse.show { padding: .5rem 0 .75rem; border-top: 1px solid var(--sl-line); margin-top: .5rem; }
 .sl-navbar {
   background: rgba(251,250,247,.92);
   backdrop-filter: blur(12px);
@@ -1237,6 +1240,29 @@ footer {
 @keyframes spin { to { transform: rotate(360deg); } }
 
 /* ─── Test feedback ──────────────────────────────────────────────────────────*/
-.feedback-correct { background: #dcfce7; color: var(--sl-success); font-size: var(--sl-text-xs); font-weight: 500; border-radius: var(--sl-radius-sm); }
-.feedback-wrong   { background: var(--sl-danger-bg); color: var(--sl-danger); font-size: var(--sl-text-xs); font-weight: 500; border-radius: var(--sl-radius-sm); }
-[data-theme="dark"] .feedback-correct { background: #132514; }
+.feedback-correct { background: var(--sl-primary-bg); color: var(--sl-success); font-size: var(--sl-text-xs); font-weight: 500; border-radius: var(--sl-radius-sm); }
+.feedback-wrong   { background: var(--sl-danger-bg);  color: var(--sl-danger);  font-size: var(--sl-text-xs); font-weight: 500; border-radius: var(--sl-radius-sm); }
+
+/* ─── Result circle score variants ──────────────────────────────────────────*/
+.result-circle--good { background: var(--sl-primary-bg); border-color: var(--sl-success) !important; color: var(--sl-success) !important; }
+.result-circle--ok   { background: var(--sl-accent-bg);  border-color: var(--sl-accent) !important;  color: var(--sl-accent)   !important; }
+.result-circle--bad  { background: var(--sl-danger-bg);  border-color: var(--sl-danger) !important;  color: var(--sl-danger)   !important; }
+
+/* ─── Safe-area / Telegram Mini App ─────────────────────────────────────────*/
+body {
+  padding-top:    env(safe-area-inset-top,    0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left:   env(safe-area-inset-left,   0px);
+  padding-right:  env(safe-area-inset-right,  0px);
+}
+
+/* ─── Mobile touch improvements ──────────────────────────────────────────────*/
+@media (max-width: 767px) {
+  /* Ensure study tabs scroll horizontally if they overflow on very small screens */
+  .study-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; flex-wrap: nowrap; }
+  /* More breathing room for tap targets on mobile */
+  .sl-nav-link { padding: .5rem .875rem !important; }
+  .hub-tile { min-height: 120px; padding: 1.25rem 1rem; }
+  .rating-btn { min-height: 48px; padding: .75rem 1rem; }
+  .answer-btn { min-height: 54px; }
+}
