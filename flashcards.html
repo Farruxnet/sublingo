@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SubLingo — Flashcards</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ── Navbar ──────────────────────────────────────────────────────────── -->
+  <nav class="navbar navbar-expand-md navbar-sublingo sticky-top">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center" href="index.html">
+        <span class="brand-logo"><i class="bi bi-translate"></i></span>
+        <span>SubLingo</span>
+      </a>
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav ms-auto gap-1">
+          <li class="nav-item"><a class="nav-link" href="index.html"><i class="bi bi-house me-1"></i>Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="words.html"><i class="bi bi-list-ul me-1"></i>Words</a></li>
+          <li class="nav-item"><a class="nav-link" href="flashcards.html"><i class="bi bi-card-text me-1"></i>Flashcards</a></li>
+          <li class="nav-item"><a class="nav-link" href="test.html"><i class="bi bi-patch-question me-1"></i>Test</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container py-4">
+
+    <!-- ── Progress strip ───────────────────────────────────────────────── -->
+    <div class="d-flex align-items-center justify-content-between mb-2">
+      <span class="small fw-semibold text-muted" id="cardCounter">Card 1 / 15</span>
+      <a href="words.html" class="small text-muted text-decoration-none">
+        <i class="bi bi-pencil me-1"></i>Edit deck
+      </a>
+    </div>
+    <div class="progress mb-4" style="height: 8px; border-radius: 99px;">
+      <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%; border-radius: 99px;" aria-valuemin="0" aria-valuemax="100"></div>
+    </div>
+
+    <!-- ── Study screen ──────────────────────────────────────────────────── -->
+    <div id="studyScreen">
+
+      <!-- Flashcard -->
+      <div class="flashcard-scene mb-2" style="min-height: 300px;">
+        <div class="flashcard" id="flashcard" onclick="flipCard()" role="button" aria-label="Flip card">
+          <!-- Front -->
+          <div class="flashcard-face flashcard-front">
+            <div class="text-center w-100">
+              <div class="d-flex align-items-center justify-content-center gap-2 mb-1">
+                <div class="card-word" id="cardWord">reluctant</div>
+                <button class="btn-audio" onclick="event.stopPropagation(); playWordAudio(document.getElementById('cardWord').textContent)" title="Pronounce">
+                  <i class="bi bi-volume-up"></i>
+                </button>
+              </div>
+              <div class="card-ipa" id="cardIpa">/rɪˈlʌktənt/</div>
+              <div class="mt-2" id="cardPosLevel"></div>
+              <div class="mt-4 text-muted small">
+                <i class="bi bi-hand-index me-1"></i>Tap to see translation
+              </div>
+            </div>
+          </div>
+          <!-- Back -->
+          <div class="flashcard-face flashcard-back">
+            <div class="text-center w-100">
+              <div class="card-translation" id="cardTranslation">istamasdan, ikkilanuvchi</div>
+              <div class="card-definition" id="cardDefinition">Unwilling and hesitant; not eager to do something.</div>
+              <div class="card-example" id="cardExample">"She was reluctant to leave the party early."</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p class="flip-hint mb-3">
+        <i class="bi bi-arrow-repeat me-1"></i>Tap the card to flip &nbsp;|&nbsp; Rate yourself after seeing the answer
+      </p>
+
+      <!-- Rating buttons (shown after flip) -->
+      <div class="d-flex justify-content-center gap-2 flex-wrap mb-4">
+        <button class="btn btn-again px-4 py-2" onclick="rateCard('again')" title="I didn't remember this">
+          <i class="bi bi-arrow-counterclockwise me-1"></i>Again
+        </button>
+        <button class="btn btn-hard px-4 py-2" onclick="rateCard('hard')" title="I remembered with difficulty">
+          <i class="bi bi-emoji-neutral me-1"></i>Hard
+        </button>
+        <button class="btn btn-easy px-4 py-2" onclick="rateCard('easy')" title="I remembered easily">
+          <i class="bi bi-emoji-smile me-1"></i>Easy
+        </button>
+      </div>
+
+      <!-- Prev / Next navigation -->
+      <div class="d-flex justify-content-center gap-3">
+        <button class="btn btn-outline-secondary px-3" id="prevBtn" onclick="goBack()" disabled>
+          <i class="bi bi-chevron-left me-1"></i>Previous
+        </button>
+        <button class="btn btn-outline-sl px-3" onclick="advance()">
+          Skip <i class="bi bi-chevron-right ms-1"></i>
+        </button>
+      </div>
+
+    </div><!-- /studyScreen -->
+
+    <!-- ── Completion screen ─────────────────────────────────────────────── -->
+    <div id="completionScreen" class="d-none text-center py-4">
+      <div class="result-circle mb-3">
+        <i class="bi bi-trophy-fill fs-1" style="color: var(--sl-primary);"></i>
+      </div>
+      <h2 class="fw-bold mb-1">Deck complete!</h2>
+      <p class="text-muted mb-4">You reviewed all <strong id="summaryTotal">0</strong> words.</p>
+
+      <div class="row g-3 justify-content-center mb-4">
+        <div class="col-4 col-sm-3">
+          <div class="sl-card p-3 text-center">
+            <div class="fs-3 fw-bold" style="color: #16a34a;"><span id="summaryEasy">0</span></div>
+            <div class="small text-muted">Easy</div>
+          </div>
+        </div>
+        <div class="col-4 col-sm-3">
+          <div class="sl-card p-3 text-center">
+            <div class="fs-3 fw-bold" style="color: #d97706;"><span id="summaryHard">0</span></div>
+            <div class="small text-muted">Hard</div>
+          </div>
+        </div>
+        <div class="col-4 col-sm-3">
+          <div class="sl-card p-3 text-center">
+            <div class="fs-3 fw-bold" style="color: #dc2626;"><span id="summaryAgain">0</span></div>
+            <div class="small text-muted">Again</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex flex-wrap justify-content-center gap-3">
+        <button class="btn btn-outline-sl px-4 py-2 fw-semibold" onclick="restartDeck()">
+          <i class="bi bi-arrow-repeat me-2"></i>Study Again
+        </button>
+        <a href="test.html" class="btn btn-primary px-4 py-2 fw-semibold">
+          <i class="bi bi-patch-question me-2"></i>Take Test
+        </a>
+        <a href="index.html" class="btn btn-outline-secondary px-4 py-2">
+          <i class="bi bi-house me-2"></i>Home
+        </a>
+      </div>
+    </div><!-- /completionScreen -->
+
+  </main>
+
+  <!-- ── Footer ──────────────────────────────────────────────────────────── -->
+  <footer>
+    <strong>SubLingo</strong> &nbsp;·&nbsp; English–Uzbek vocabulary builder
+  </footer>
+
+  <div id="toast-container"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/mockData.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/flashcards.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      initDeck();
+
+      // Keyboard shortcuts
+      document.addEventListener('keydown', e => {
+        if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); flipCard(); }
+        if (e.key === 'ArrowRight') advance();
+        if (e.key === 'ArrowLeft')  goBack();
+        if (e.key === '1') rateCard('again');
+        if (e.key === '2') rateCard('hard');
+        if (e.key === '3') rateCard('easy');
+      });
+    });
+  </script>
+</body>
+</html>

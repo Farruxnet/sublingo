@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SubLingo — Learn English from Subtitles</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ── Navbar ──────────────────────────────────────────────────────────── -->
+  <nav class="navbar navbar-expand-md navbar-sublingo sticky-top">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center" href="index.html">
+        <span class="brand-logo"><i class="bi bi-translate"></i></span>
+        <span>SubLingo</span>
+      </a>
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav ms-auto gap-1">
+          <li class="nav-item"><a class="nav-link" href="index.html"><i class="bi bi-house me-1"></i>Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="words.html"><i class="bi bi-list-ul me-1"></i>Words</a></li>
+          <li class="nav-item"><a class="nav-link" href="flashcards.html"><i class="bi bi-card-text me-1"></i>Flashcards</a></li>
+          <li class="nav-item"><a class="nav-link" href="test.html"><i class="bi bi-patch-question me-1"></i>Test</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── Hero ────────────────────────────────────────────────────────────── -->
+  <section class="hero-section">
+    <div class="container text-center">
+      <div class="mb-3">
+        <span class="badge bg-white text-primary fw-semibold px-3 py-2 rounded-pill" style="color: var(--sl-primary) !important;">
+          <i class="bi bi-stars me-1"></i>AI-powered vocabulary learning
+        </span>
+      </div>
+      <h1 class="display-5 fw-bold mb-3">Learn English from<br>video subtitles</h1>
+      <p class="lead mb-4">Upload any subtitle file, extract new vocabulary, and master words with flashcards and quizzes — all with Uzbek translations.</p>
+      <a href="#upload" class="btn btn-light btn-lg px-4 rounded-pill fw-semibold" style="color: var(--sl-primary);">
+        <i class="bi bi-upload me-2"></i>Start Learning
+      </a>
+    </div>
+  </section>
+
+  <main class="container py-4">
+
+    <!-- ── Upload Card ──────────────────────────────────────────────────── -->
+    <section id="upload" class="mb-5">
+      <div class="sl-card p-4">
+        <h2 class="fs-5 fw-bold mb-4"><i class="bi bi-cloud-upload me-2 text-primary" style="color: var(--sl-primary);"></i>Upload Subtitle File</h2>
+
+        <!-- Tabs: File / Paste / YouTube -->
+        <ul class="nav nav-pills mb-3 gap-2" id="uploadTabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active px-3" id="tab-file" data-bs-toggle="pill" data-bs-target="#pane-file" type="button">
+              <i class="bi bi-file-earmark-text me-1"></i>File Upload
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link px-3" id="tab-paste" data-bs-toggle="pill" data-bs-target="#pane-paste" type="button">
+              <i class="bi bi-clipboard-text me-1"></i>Paste Text
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link px-3 disabled" type="button">
+              <i class="bi bi-youtube me-1"></i>YouTube Link
+              <span class="badge-coming-soon ms-1">coming soon</span>
+            </button>
+          </li>
+        </ul>
+
+        <div class="tab-content">
+          <!-- File upload pane -->
+          <div class="tab-pane fade show active" id="pane-file">
+            <!-- TODO: replace with real file-reading logic → subtitle parser -->
+            <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+              <i class="bi bi-cloud-arrow-up display-4 mb-2"></i>
+              <h5 class="fw-semibold mb-1">Drag & drop your subtitle file here</h5>
+              <p class="text-muted small">Supports <strong>.srt</strong> and <strong>.vtt</strong> formats — max 5 MB</p>
+              <input type="file" id="fileInput" accept=".srt,.vtt" class="d-none" />
+            </div>
+            <div id="fileInfo" class="mt-2 text-muted small d-none">
+              <i class="bi bi-file-check text-success"></i> <span id="fileName"></span>
+            </div>
+          </div>
+
+          <!-- Paste text pane -->
+          <div class="tab-pane fade" id="pane-paste">
+            <!-- TODO: replace with real text-processing logic -->
+            <textarea class="form-control" rows="6" placeholder="Paste subtitle text or any English text here…" style="border-radius: 12px; border-color: var(--sl-border);"></textarea>
+          </div>
+        </div>
+
+        <!-- Options row -->
+        <div class="row g-3 mt-2">
+          <div class="col-sm-6">
+            <label class="form-label small fw-semibold text-muted">Target CEFR level (filter)</label>
+            <select class="form-select form-select-sm" style="border-radius: 8px;">
+              <option value="">All levels</option>
+              <option value="A2">A2 — Elementary</option>
+              <option value="B1">B1 — Intermediate</option>
+              <option value="B2">B2 — Upper-Intermediate</option>
+            </select>
+          </div>
+          <div class="col-sm-6">
+            <label class="form-label small fw-semibold text-muted">Language pair</label>
+            <select class="form-select form-select-sm" style="border-radius: 8px;">
+              <option>English → Uzbek</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mt-4 d-flex gap-2 flex-wrap">
+          <!-- TODO: on real click, trigger subtitle parsing API, then navigate -->
+          <button class="btn btn-primary px-4 py-2 fw-semibold" onclick="handleExtract()">
+            <i class="bi bi-magic me-2"></i>Extract Words
+          </button>
+          <button class="btn btn-outline-secondary px-3 py-2" onclick="document.getElementById('dropZone').click()">
+            <i class="bi bi-arrow-repeat me-1"></i>Reset
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Stats Strip ───────────────────────────────────────────────────── -->
+    <section class="row g-3 mb-5 text-center">
+      <div class="col-4">
+        <div class="sl-card p-3">
+          <div class="fs-2 fw-bold" style="color: var(--sl-primary);">15</div>
+          <div class="small text-muted">Words Loaded</div>
+        </div>
+      </div>
+      <div class="col-4">
+        <div class="sl-card p-3">
+          <div class="fs-2 fw-bold" style="color: var(--sl-secondary);">0</div>
+          <div class="small text-muted">Learned</div>
+        </div>
+      </div>
+      <div class="col-4">
+        <div class="sl-card p-3">
+          <div class="fs-2 fw-bold" style="color: #f59e0b;">0%</div>
+          <div class="small text-muted">Mastery</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Recent Sessions ───────────────────────────────────────────────── -->
+    <section class="mb-5">
+      <h2 class="fs-5 fw-bold mb-3"><i class="bi bi-clock-history me-2"></i>Recent Sessions</h2>
+      <!-- TODO: load real sessions from backend / localStorage -->
+      <div class="row g-3">
+        <div class="col-md-4">
+          <div class="sl-card session-card p-3">
+            <div class="d-flex align-items-start gap-2">
+              <span class="badge rounded-pill text-bg-primary mt-1">B1</span>
+              <div>
+                <div class="fw-semibold">Breaking Bad — S01E01</div>
+                <div class="small text-muted">12 words extracted • 4 learned</div>
+                <div class="small text-muted mt-1"><i class="bi bi-calendar3 me-1"></i>Today</div>
+              </div>
+            </div>
+            <div class="progress mt-2" style="height: 5px;">
+              <div class="progress-bar" style="width: 33%"></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="sl-card session-card p-3">
+            <div class="d-flex align-items-start gap-2">
+              <span class="badge rounded-pill text-bg-warning text-dark mt-1">B2</span>
+              <div>
+                <div class="fw-semibold">TED Talk — How to learn</div>
+                <div class="small text-muted">20 words extracted • 15 learned</div>
+                <div class="small text-muted mt-1"><i class="bi bi-calendar3 me-1"></i>Yesterday</div>
+              </div>
+            </div>
+            <div class="progress mt-2" style="height: 5px;">
+              <div class="progress-bar" style="width: 75%"></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="sl-card session-card p-3">
+            <div class="d-flex align-items-start gap-2">
+              <span class="badge rounded-pill text-bg-success mt-1">A2</span>
+              <div>
+                <div class="fw-semibold">Friends — S02E05</div>
+                <div class="small text-muted">8 words extracted • 8 learned</div>
+                <div class="small text-muted mt-1"><i class="bi bi-calendar3 me-1"></i>2 days ago</div>
+              </div>
+            </div>
+            <div class="progress mt-2" style="height: 5px;">
+              <div class="progress-bar" style="width: 100%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── How It Works ──────────────────────────────────────────────────── -->
+    <section class="mb-5">
+      <h2 class="fs-5 fw-bold mb-4 text-center">How SubLingo Works</h2>
+      <div class="row g-3 text-center">
+        <div class="col-6 col-md-3">
+          <div class="sl-card p-3 h-100">
+            <div class="fs-1 mb-2" style="color: var(--sl-primary);">
+              <i class="bi bi-upload"></i>
+            </div>
+            <div class="fw-semibold small">Upload Subtitles</div>
+            <div class="text-muted" style="font-size: 0.78rem;">Drop any .srt or .vtt file</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="sl-card p-3 h-100">
+            <div class="fs-1 mb-2" style="color: var(--sl-primary);">
+              <i class="bi bi-magic"></i>
+            </div>
+            <div class="fw-semibold small">AI Extracts Words</div>
+            <div class="text-muted" style="font-size: 0.78rem;">Smart vocabulary selection</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="sl-card p-3 h-100">
+            <div class="fs-1 mb-2" style="color: var(--sl-primary);">
+              <i class="bi bi-card-text"></i>
+            </div>
+            <div class="fw-semibold small">Study Flashcards</div>
+            <div class="text-muted" style="font-size: 0.78rem;">Flip cards with translations</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="sl-card p-3 h-100">
+            <div class="fs-1 mb-2" style="color: var(--sl-primary);">
+              <i class="bi bi-trophy"></i>
+            </div>
+            <div class="fw-semibold small">Take the Quiz</div>
+            <div class="text-muted" style="font-size: 0.78rem;">Test your mastery</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ── Footer ──────────────────────────────────────────────────────────── -->
+  <footer>
+    <span class="brand-logo d-inline-flex" style="width:20px;height:20px;font-size:0.7rem;border-radius:5px;vertical-align:middle;margin-right:4px;background:var(--sl-primary);color:#fff;align-items:center;justify-content:center;">
+      <i class="bi bi-translate"></i>
+    </span>
+    <strong>SubLingo</strong> &nbsp;·&nbsp; English–Uzbek vocabulary builder &nbsp;·&nbsp;
+    <span>MVP v0.1</span>
+  </footer>
+
+  <!-- ── Toast Container ──────────────────────────────────────────────────── -->
+  <div id="toast-container"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/mockData.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    // Drag-and-drop handler
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const fileInfo  = document.getElementById('fileInfo');
+    const fileNameEl = document.getElementById('fileName');
+
+    dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+    dropZone.addEventListener('drop', e => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      if (file) showFileSelected(file);
+    });
+
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files[0]) showFileSelected(fileInput.files[0]);
+    });
+
+    function showFileSelected(file) {
+      fileNameEl.textContent = `${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+      fileInfo.classList.remove('d-none');
+      // TODO: actually read and parse file contents here
+    }
+
+    function handleExtract() {
+      // TODO: replace with real subtitle parsing → API call → populate mockData dynamically
+      showToast('Words extracted! Redirecting…', 'success');
+      setTimeout(() => navigateTo('words.html'), 900);
+    }
+  </script>
+</body>
+</html>
