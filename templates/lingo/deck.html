@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}SubLingo — {{ deck.name }}{% endblock %}
+
+{% block content %}
+<main style="max-width:760px;margin:0 auto;padding:2rem 1.25rem 4rem;">
+
+  <a href="{% url 'library' %}"
+     style="font-size:var(--sl-text-xs);color:var(--sl-muted);text-decoration:none;display:inline-flex;align-items:center;gap:.3rem;margin-bottom:1.5rem;">
+    <i class="bi bi-arrow-left"></i> My Library
+  </a>
+
+  <div class="d-flex align-items-start justify-content-between gap-3 flex-wrap mb-4">
+    <div style="flex:1;min-width:0;">
+      <h1 style="font-family:'Fraunces',Georgia,serif;font-size:var(--sl-text-xl);font-weight:700;margin:0 0 .25rem;line-height:1.15;">
+        {{ deck.name }}
+      </h1>
+      <div style="font-size:var(--sl-text-xs);color:var(--sl-muted);">
+        {{ deck.source }} · {{ total }} word{{ total|pluralize }} ·
+        <span style="color:var(--sl-primary);font-weight:600;">{{ learned }} learned ({{ pct }}%)</span> ·
+        Last studied: {% if deck.last_studied %}{{ deck.last_studied|timesince }} ago{% else %}Never{% endif %}
+      </div>
+    </div>
+    <div id="deckRing" style="flex-shrink:0;"></div>
+  </div>
+
+  <div class="sl-progress mb-5">
+    <div class="sl-progress-bar" style="width:{{ pct }}%;"></div>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-12 col-sm-4">
+      <a href="{% url 'words' deck.pk %}" class="hub-tile" aria-label="Browse word list">
+        <div class="hub-tile__icon"><i class="bi bi-list-ul"></i></div>
+        <div class="hub-tile__title">Words</div>
+        <p class="hub-tile__desc">Browse all vocabulary in this deck</p>
+      </a>
+    </div>
+    <div class="col-12 col-sm-4">
+      <a href="{% url 'flashcards' deck.pk %}"
+         class="hub-tile hub-tile--accent{% if no_words %} hub-tile--disabled{% endif %}"
+         aria-label="Study with flashcards">
+        <div class="hub-tile__icon"><i class="bi bi-card-text"></i></div>
+        <div class="hub-tile__title">Flashcards</div>
+        <p class="hub-tile__desc">Flip cards — see Uzbek translations</p>
+      </a>
+    </div>
+    <div class="col-12 col-sm-4">
+      <a href="{% url 'test' deck.pk %}"
+         class="hub-tile{% if too_few %} hub-tile--disabled{% endif %}"
+         aria-label="Take a multiple-choice test">
+        <div class="hub-tile__icon"><i class="bi bi-patch-question"></i></div>
+        <div class="hub-tile__title">Test</div>
+        <p class="hub-tile__desc">Multiple-choice quiz on this deck</p>
+      </a>
+    </div>
+  </div>
+
+  {% if no_words %}
+  <div class="mt-4" style="font-size:var(--sl-text-xs);color:var(--sl-muted);background:var(--sl-soft);border-radius:var(--sl-radius-sm);padding:.75rem 1rem;">
+    <i class="bi bi-info-circle me-1"></i>
+    This deck has no words yet. Flashcards and Test require at least 2 words.
+  </div>
+  {% elif too_few %}
+  <div class="mt-4" style="font-size:var(--sl-text-xs);color:var(--sl-muted);background:var(--sl-soft);border-radius:var(--sl-radius-sm);padding:.75rem 1rem;">
+    <i class="bi bi-info-circle me-1"></i>
+    Test needs at least 2 words. Add more to unlock it.
+  </div>
+  {% endif %}
+
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.getElementById('deckRing').innerHTML = (function() {
+    const learned = {{ learned }}, total = {{ total }}, size = 56, stroke = 5;
+    const pct = total > 0 ? learned / total : 0;
+    const r = (size - stroke) / 2;
+    const circ = 2 * Math.PI * r;
+    const dash = (pct * circ).toFixed(1);
+    const cx = size / 2;
+    return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" fill="none" aria-hidden="true">
+      <circle cx="${cx}" cy="${cx}" r="${r}" stroke="var(--sl-line)" stroke-width="${stroke}"/>
+      <circle cx="${cx}" cy="${cx}" r="${r}" stroke="var(--sl-primary)" stroke-width="${stroke}"
+        stroke-dasharray="${dash} ${circ.toFixed(1)}" stroke-dashoffset="0"
+        stroke-linecap="round" transform="rotate(-90 ${cx} ${cx})"/>
+    </svg>`;
+  })();
+</script>
+{% endblock %}

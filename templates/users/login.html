@@ -1,23 +1,26 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SubLingo — Learn English from Subtitles</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="{% static 'css/style.css' %}" />
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script>
-    (function(){var t=localStorage.getItem('sublingo_theme');document.documentElement.setAttribute('data-theme',t||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));})();
+    (function(){
+      var t = localStorage.getItem('sublingo_theme');
+      document.documentElement.setAttribute('data-theme', t || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+    })();
   </script>
 </head>
 <body class="landing-body">
 
-<!-- ── Landing navbar (transparent, absolute) ────────────────────────────── -->
 <nav class="landing-nav">
   <div class="container d-flex align-items-center justify-content-between" style="max-width:1100px;">
-    <a class="sl-brand" href="index.html">
+    <a class="sl-brand" href="/">
       <span class="sl-brand-mark"><i class="bi bi-translate"></i></span>
       SubLingo
     </a>
@@ -28,12 +31,10 @@
   </div>
 </nav>
 
-<!-- ── Hero ──────────────────────────────────────────────────────────────── -->
 <section class="landing-hero">
   <div class="container" style="max-width:1100px;">
     <div class="row align-items-center g-5">
 
-      <!-- Left: copy + CTA -->
       <div class="col-lg-6">
         <div class="landing-hero__kicker">
           <i class="bi bi-stars"></i> AI-powered vocabulary
@@ -47,8 +48,6 @@
         <a href="#login" class="btn-primary-sl" style="font-size:var(--sl-text-base);padding:.75rem 2rem;">
           Get started — it's free
         </a>
-
-        <!-- Value loop -->
         <div class="value-loop">
           <div class="value-step"><i class="bi bi-file-earmark-text"></i> Subtitle</div>
           <span class="value-arrow"><i class="bi bi-arrow-right"></i></span>
@@ -60,44 +59,30 @@
         </div>
       </div>
 
-      <!-- Right: login card -->
       <div class="col-lg-5 offset-lg-1 d-flex justify-content-center" id="login">
         <div class="login-card">
           <div class="login-card__title">Welcome back</div>
-          <p class="login-card__sub">Sign in to access your decks and study progress.</p>
+          <p class="login-card__sub">Open the Telegram bot and press /start to get your login link.</p>
 
-          <!-- TODO: replace btn-provider handlers with real OAuth:
-               Google  → load https://accounts.google.com/gsi/client + google.accounts.id.initialize()
-               Telegram → inject Telegram Login Widget script, set data-auth-url to your callback.
-               On successful token, call loginUser(email) then redirect. requireAuth() will later
-               validate the token against the server rather than checking a localStorage bool. -->
+          {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags|default:'info' }} py-2 px-3" style="font-size:var(--sl-text-xs);">
+              {{ message }}
+            </div>
+            {% endfor %}
+          {% endif %}
+
           <div class="d-flex flex-column gap-2">
-            <button class="btn-provider" id="googleBtn" aria-label="Continue with Google">
-              <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true" focusable="false">
-                <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
-                <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/>
-                <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
-                <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
-              </svg>
-              Continue with Google
-            </button>
-
-            <button class="btn-provider" id="telegramBtn" aria-label="Continue with Telegram">
+            <a class="btn-provider" href="https://t.me/{{ telegram_bot_username }}" target="_blank" rel="noopener">
               <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="#229ED9">
                 <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.941z"/>
               </svg>
-              Continue with Telegram
-            </button>
+              Open Telegram Bot
+            </a>
           </div>
 
-          <div class="login-divider">or</div>
-
-          <button class="btn-guest" id="guestBtn" type="button">
-            Continue as guest
-          </button>
-
           <p style="font-size:var(--sl-text-xs);color:var(--sl-muted);text-align:center;margin-top:1rem;margin-bottom:0;">
-            Guest mode saves your decks locally in this browser.
+            The bot will send you a secure one-time login link.
           </p>
         </div>
       </div>
@@ -106,7 +91,6 @@
   </div>
 </section>
 
-<!-- ── Feature strip ─────────────────────────────────────────────────────── -->
 <section style="background:var(--sl-surface);border-top:1px solid var(--sl-line);padding:3.5rem 0;">
   <div class="container" style="max-width:1100px;">
     <div class="row g-4 text-center">
@@ -134,38 +118,40 @@
   </div>
 </section>
 
-<!-- ── Footer ────────────────────────────────────────────────────────────── -->
 <footer>
   <div style="max-width:1100px;margin:0 auto;padding:0 1.25rem;">
     <strong style="font-family:'Fraunces',Georgia,serif;">SubLingo</strong>
-    &nbsp;·&nbsp; English–Uzbek vocabulary builder &nbsp;·&nbsp; MVP v0.5
+    &nbsp;·&nbsp; English–Uzbek vocabulary builder
   </div>
 </footer>
 
 <div id="toast-container"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="js/mockData.js"></script>
-<script src="js/main.js"></script>
 <script>
-  if (isLoggedIn()) { window.location.replace('library.html'); }
-
-  // TODO: swap body of loginWithProvider() for real OAuth when backend is ready.
-  // Google: exchange id_token from google.accounts.id flow → POST /api/auth/google
-  // Telegram: if running inside Telegram Mini App (window.Telegram?.WebApp exists),
-  //   skip this button entirely and call loginUser() from Telegram.WebApp.initDataUnsafe.user
-  //   then POST /api/auth/telegram { initData: Telegram.WebApp.initData } → { email, token }.
-  //   Otherwise use the Telegram Login Widget callback → POST /api/auth/telegram.
-  //   Both return { email, token }; store token and call loginUser(email).
-  function loginWithProvider(provider) {
-    const placeholders = { google: 'google_user', telegram: 'telegram_user' };
-    loginUser(placeholders[provider] || '');
-    window.location.replace('library.html');
-  }
-
-  document.getElementById('googleBtn').addEventListener('click', () => loginWithProvider('google'));
-  document.getElementById('telegramBtn').addEventListener('click', () => loginWithProvider('telegram'));
-  document.getElementById('guestBtn').addEventListener('click', () => { loginUser(''); window.location.replace('library.html'); });
+  (function() {
+    function _updateThemeIcon() {
+      var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      document.querySelectorAll('.btn-theme').forEach(function(btn) {
+        btn.innerHTML = isDark
+          ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>'
+          : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+      });
+    }
+    function toggleTheme() {
+      var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      var next = isDark ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('sublingo_theme', next);
+      _updateThemeIcon();
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+      _updateThemeIcon();
+      document.querySelectorAll('.btn-theme').forEach(function(btn) {
+        btn.addEventListener('click', toggleTheme);
+      });
+    });
+  })();
 </script>
 </body>
 </html>

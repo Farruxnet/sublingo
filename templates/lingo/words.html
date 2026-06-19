@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}SubLingo — {{ deck.name }} · Words{% endblock %}
+
+{% block content %}
+<div style="max-width:1100px;margin:0 auto;padding:0 1.25rem;">
+  <a href="{% url 'library' %}" class="sl-back-link">← My Library</a>
+</div>
+
+<main style="max-width:1100px;margin:0 auto;padding:0 1.25rem 5rem;">
+
+  <div class="deck-header mt-4">
+    <div class="d-flex align-items-start justify-content-between gap-3 flex-wrap">
+      <div style="flex:1;min-width:0;">
+        <a href="{% url 'deck' deck.pk %}"
+           style="font-size:var(--sl-text-xs);color:var(--sl-muted);text-decoration:none;display:inline-flex;align-items:center;gap:.3rem;margin-bottom:.5rem;">
+          <i class="bi bi-arrow-left"></i> Back to deck
+        </a>
+        <h1 class="deck-header__name" style="font-family:'Fraunces',Georgia,serif;font-size:var(--sl-text-xl);font-weight:700;margin:0 0 .25rem;">
+          {{ deck.name }}
+        </h1>
+        <div style="font-size:var(--sl-text-xs);color:var(--sl-muted);">
+          {{ deck.source }} · {{ total }} words ·
+          <span style="color:var(--sl-primary);font-weight:600;">{{ learned }} learned ({{ pct }}%)</span>
+        </div>
+      </div>
+      <div class="d-flex gap-2 flex-shrink-0 flex-wrap">
+        <a href="{% url 'flashcards' deck.pk %}" class="btn-primary-sl"><i class="bi bi-card-text"></i> Study deck</a>
+        <a href="{% url 'test' deck.pk %}" class="btn-ghost"><i class="bi bi-patch-question"></i> Test</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="sl-filters mb-4 mt-3">
+    <div class="row g-2 align-items-center">
+      <div class="col-12 col-sm-5 col-md-4">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-search" style="color:var(--sl-muted);font-size:.85rem;flex-shrink:0;"></i>
+          <input type="text" id="searchInput" class="sl-input"
+                 placeholder="Search words…"
+                 style="padding:.4rem .6rem;font-size:var(--sl-text-xs);"
+                 oninput="renderWords()" />
+        </div>
+      </div>
+      <div class="col-6 col-sm-4 col-md-3">
+        <select id="levelFilter" class="sl-input sl-select"
+                style="padding:.4rem .6rem;font-size:var(--sl-text-xs);" onchange="renderWords()">
+          <option value="">All CEFR levels</option>
+          <option value="A1">A1</option><option value="A2">A2</option>
+          <option value="B1">B1</option><option value="B2">B2</option><option value="C1">C1</option>
+        </select>
+      </div>
+      <div class="col-6 col-sm-3 col-md-3">
+        <select id="posFilter" class="sl-input sl-select"
+                style="padding:.4rem .6rem;font-size:var(--sl-text-xs);" onchange="renderWords()">
+          <option value="">All parts of speech</option>
+          <option value="noun">Nouns</option>
+          <option value="verb">Verbs</option>
+          <option value="adjective">Adjectives</option>
+        </select>
+      </div>
+      <div class="col-12 col-md-2 text-md-end">
+        <span style="font-size:var(--sl-text-xs);color:var(--sl-muted);">
+          <span id="visibleCount">{{ words|length }}</span> words
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3" id="wordsGrid"></div>
+
+  <div id="emptyWords" class="sl-empty d-none">
+    <div class="sl-empty__icon"><i class="bi bi-search"></i></div>
+    <h3 class="sl-empty__title">No words match</h3>
+    <p class="sl-empty__body">Try a different search term or filter.</p>
+  </div>
+
+</main>
+
+<div class="study-bar">
+  <div class="d-flex align-items-center justify-content-between" style="max-width:1100px;margin:0 auto;">
+    <span style="font-size:var(--sl-text-xs);color:var(--sl-muted);" id="progressLabel">
+      {{ learned }} / {{ total }} words learned · {{ pct }}%
+    </span>
+    <a href="{% url 'flashcards' deck.pk %}" class="btn-primary-sl">Study deck <i class="bi bi-arrow-right ms-1"></i></a>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const CSRF_TOKEN = '{{ csrf_token }}';
+  const TOGGLE_URL_TEMPLATE = '/deck/{{ deck.pk }}/words/__WORD_ID__/toggle/';
+
+  const ALL_WORDS = {{ words_json|safe }};
+
+  function getFilteredWords() {
+    const q = document.getElementById('searchInput').value.toLowerCase().trim();
+    const level = document.getElementById('levelFilter').value;
+    const pos = document.getElementById('posFilter').value;
+    return ALL_WORDS.filter(w => {
+      const mQ = !q || w.word.toLowerCase().includes(q) || w.translation.toLowerCase().includes(q);
+      const mL = !level || w.level === level;
+      const mP = !pos || w.partOfSpeech.toLowerCase().includes(pos);
+      return mQ && mL && mP;
+    });
+  }
+
+  function renderWords() {
+    const filtered = getFilteredWords();
+    const grid = document.getElementById('wordsGrid');
+    const empty = document.getElementById('emptyWords');
+    document.getElementById('visibleCount').textContent = filtered.length;
+
+    if (filtered.length === 0) {
+      grid.innerHTML = '';
+      empty.classList.remove('d-none');
+      return;
+    }
+    empty.classList.add('d-none');
+
+    grid.innerHTML = filtered.map(w => `
+      <div class="col-12 col-md-6 col-xl-4">
+        <div class="word-card h-100 d-flex flex-column">
+          <div class="word-card__head">
+            <span class="word-card__word">${escapeHtml(w.word)}</span>
+            <button class="btn-audio" data-word="${escapeHtml(w.word)}" title="Pronounce" aria-label="Pronounce ${escapeHtml(w.word)}">
+              <i class="bi bi-volume-up" aria-hidden="true"></i>
+            </button>
+            <span class="word-card__ipa ms-auto">${escapeHtml(w.ipa)}</span>
+          </div>
+          <div class="d-flex gap-1 mb-2 flex-wrap">
+            <span class="${posBadgeClass(w.partOfSpeech)}">${escapeHtml(w.partOfSpeech)}</span>
+            <span class="${levelBadgeClass(w.level)}">${escapeHtml(w.level)}</span>
+          </div>
+          <div class="word-card__translation">${escapeHtml(w.translation)}</div>
+          <div class="word-card__definition">${escapeHtml(w.definition)}</div>
+          <div class="word-card__example">"${escapeHtml(w.example)}"</div>
+          <div class="mt-auto pt-2" style="border-top:1px solid var(--sl-line);margin-top:.75rem !important;">
+            <button class="btn-ghost-sm w-100 justify-content-center learned-toggle"
+                    data-word-id="${w.id}"
+                    aria-label="${w.learned ? 'Mark as not learned' : 'Mark as learned'}"
+                    style="${w.learned ? 'color:var(--sl-success);border-color:var(--sl-success);' : ''}">
+              <i class="bi ${w.learned ? 'bi-check-circle-fill' : 'bi-circle'}" aria-hidden="true"></i>
+              ${w.learned ? 'Learned' : 'Mark as learned'}
+            </button>
+          </div>
+        </div>
+      </div>`).join('');
+
+    grid.querySelectorAll('.btn-audio').forEach(btn => {
+      btn.addEventListener('click', () => playWordAudio(btn.dataset.word));
+    });
+    grid.querySelectorAll('.learned-toggle').forEach(btn => {
+      btn.addEventListener('click', () => toggleLearned(parseInt(btn.dataset.wordId, 10)));
+    });
+  }
+
+  async function toggleLearned(wordId) {
+    const url = TOGGLE_URL_TEMPLATE.replace('__WORD_ID__', wordId);
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'X-CSRFToken': CSRF_TOKEN },
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    // Update local words array
+    const word = ALL_WORDS.find(w => w.id === wordId);
+    if (word) word.learned = data.learned;
+    const pct = data.total > 0 ? Math.round(data.learned_count / data.total * 100) : 0;
+    document.getElementById('progressLabel').textContent =
+      `${data.learned_count} / ${data.total} words learned · ${pct}%`;
+    renderWords();
+  }
+
+  renderWords();
+</script>
+{% endblock %}

@@ -1,61 +1,17 @@
-// test.js — Deck-scoped multiple-choice quiz logic
+// test.js — pure UI; deck/questions/score state injected by template script
 
-// TODO: replace getActiveDeck() with /api/session/words from real backend
-let deck        = null;
-let questions   = [];
-let currentQ    = 0;
-let score       = 0;
-let wrongAnswers = [];
-let answered    = false;
-
-function buildQuestions() {
-  deck = getActiveDeck();
-  if (!deck || deck.words.length < 2) return;
-
-  const pool = deck.words.length >= 4 ? deck.words : deck.words;
-
-  const shuffled = [...pool].sort(() => Math.random() - 0.5).slice(0, 10);
-
-  questions = shuffled.map(word => {
-    const distractors = pool
+function buildQuestions(words) {
+  const shuffled = [...words].sort(() => Math.random() - 0.5).slice(0, 10);
+  return shuffled.map(word => {
+    const distractors = words
       .filter(w => w.id !== word.id)
       .sort(() => Math.random() - 0.5)
       .slice(0, 3)
       .map(w => w.translation);
-
-    // Pad if fewer than 3 distractors available
     while (distractors.length < 3) distractors.push('—');
-
     const options = [...distractors, word.translation].sort(() => Math.random() - 0.5);
     return { word, correctAnswer: word.translation, options };
   });
-}
-
-function initTest() {
-  deck = getActiveDeck();
-
-  if (!deck || deck.words.length === 0) {
-    showNoDeck();
-    return;
-  }
-
-  if (deck.words.length < 2) {
-    showNoDeck('This deck needs at least 2 words to run a test.');
-    return;
-  }
-
-  buildQuestions();
-  currentQ     = 0;
-  score        = 0;
-  wrongAnswers = [];
-  answered     = false;
-
-  renderQuestion();
-}
-
-function showNoDeck(msg) {
-  showToast(msg || 'No deck selected — pick one from your library', 'info');
-  setTimeout(() => window.location.replace('library.html'), 800);
 }
 
 function renderQuestion() {
@@ -63,21 +19,19 @@ function renderQuestion() {
 
   document.getElementById('resultsScreen').classList.add('d-none');
   document.getElementById('questionScreen').classList.remove('d-none');
-
   answered = false;
 
   const { word, options } = questions[currentQ];
   const pct = Math.round(currentQ / questions.length * 100);
 
-  document.getElementById('progressBar').style.width    = pct + '%';
-  document.getElementById('qCounter').textContent       = `${currentQ + 1} / ${questions.length}`;
-  document.getElementById('scoreDisplay').textContent   = `Score: ${score}`;
-  document.getElementById('deckLabel').textContent      = deck.name;
-  document.getElementById('questionWord').textContent   = word.word;
-  document.getElementById('questionIpa').textContent    = word.ipa;
+  document.getElementById('progressBar').style.width  = pct + '%';
+  document.getElementById('qCounter').textContent     = `${currentQ + 1} / ${questions.length}`;
+  document.getElementById('scoreDisplay').textContent = `Score: ${score}`;
+  document.getElementById('deckLabel').textContent    = deck.name;
+  document.getElementById('questionWord').textContent = word.word;
+  document.getElementById('questionIpa').textContent  = word.ipa;
 
   const grid = document.getElementById('answersGrid');
-  // Index-based onclick prevents apostrophe issues in Uzbek translations
   grid.innerHTML = options.map((opt, i) => `
     <button class="answer-btn" data-index="${i}">
       <span class="answer-key">${String.fromCharCode(65 + i)}.</span>
@@ -108,12 +62,8 @@ function checkAnswer(btn, optIndex) {
   if (!isCorrect) {
     btn.classList.add('wrong');
     wrongAnswers.push(word);
-    // TODO: POST to /api/test/answer { wordId, deckId: deck.id, userId: getAnonymousId(), correct: false, timestamp }
-    console.log(`[Test] Wrong — "${word.word}", correct: "${correctAnswer}"`);
   } else {
     score++;
-    // TODO: POST to /api/test/answer { wordId, deckId: deck.id, userId: getAnonymousId(), correct: true, timestamp }
-    console.log(`[Test] Correct — "${word.word}"`);
   }
 
   const fb = document.getElementById('feedbackMsg');
@@ -122,7 +72,6 @@ function checkAnswer(btn, optIndex) {
     ? `<i class="bi bi-check-circle-fill me-2"></i>Correct! <strong>${word.word}</strong> = <em>${correctAnswer}</em>`
     : `<i class="bi bi-x-circle-fill me-2"></i>Not quite. <strong>${word.word}</strong> = <em>${correctAnswer}</em>`;
   fb.classList.remove('d-none');
-
   document.getElementById('nextBtn').classList.remove('d-none');
 }
 
@@ -135,8 +84,8 @@ function showResults() {
   document.getElementById('questionScreen').classList.add('d-none');
   document.getElementById('resultsScreen').classList.remove('d-none');
 
-  document.getElementById('progressBar').style.width  = '100%';
-  document.getElementById('qCounter').textContent     = 'Complete!';
+  document.getElementById('progressBar').style.width = '100%';
+  document.getElementById('qCounter').textContent    = 'Complete!';
 
   const total = questions.length;
   const pct   = Math.round(score / total * 100);
@@ -147,8 +96,9 @@ function showResults() {
 
   const circle = document.getElementById('scoreCircle');
   const scoreEl = document.getElementById('finalScore');
-  circle.className = 'result-circle mb-4 ' + (pct >= 80 ? 'result-circle--good' : pct >= 50 ? 'result-circle--ok' : 'result-circle--bad');
-  scoreEl.className = 'score-num ' + (pct >= 80 ? 'result-circle--good' : pct >= 50 ? 'result-circle--ok' : 'result-circle--bad');
+  const cls = pct >= 80 ? 'result-circle--good' : pct >= 50 ? 'result-circle--ok' : 'result-circle--bad';
+  circle.className = `result-circle mb-4 ${cls}`;
+  scoreEl.className = `score-num ${cls}`;
 
   document.getElementById('resultMessage').textContent =
     pct >= 80 ? 'Excellent work!' : pct >= 50 ? 'Good job — keep going!' : 'Keep practicing!';
@@ -176,8 +126,6 @@ function showResults() {
             </div>
           </div>`).join('')}
       </div>`;
-
-    // Attach audio listeners after DOM insertion
     wrongList.querySelectorAll('.btn-audio').forEach(btn => {
       btn.addEventListener('click', () => playWordAudio(btn.dataset.word));
     });
@@ -185,5 +133,10 @@ function showResults() {
 }
 
 function restartTest() {
-  initTest();
+  questions    = buildQuestions(deck.words);
+  currentQ     = 0;
+  score        = 0;
+  wrongAnswers = [];
+  answered     = false;
+  renderQuestion();
 }
